@@ -1,0 +1,1 @@
+x=msgbox("Tum Sorumluluk Son Kullaniciya Aittir!" ,0, "Onemli")
