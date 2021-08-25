@@ -1,1 +1,1 @@
-x=msgbox("All responsibility belongs to the user!" ,0, "Important")
+x=msgbox("Tum sorumluluk son kullaniciya aittir!" ,0, "Important")
