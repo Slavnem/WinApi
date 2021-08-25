@@ -92,6 +92,7 @@
       <LanguageStandard>Default</LanguageStandard>
       <LanguageStandard_C>Default</LanguageStandard_C>
       <CompileAs>Default</CompileAs>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -108,6 +109,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -148,16 +150,16 @@
     <ClCompile Include="WinApi.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="winapi.h" />
+    <ClInclude Include="winapi_includes.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="winapi_2.h" />
-    <ClInclude Include="winapi_3.h" />
+    <ClInclude Include="winapi_main.h" />
+    <ClInclude Include="winapi_language.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="WinApi.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="cpp.ico" />
+    <Image Include="c.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

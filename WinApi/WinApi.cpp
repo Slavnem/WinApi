@@ -5,8 +5,8 @@
 * 2021
 */
 
-#include "winapi.h"
-#include "winapi_2.h"
+#include "winapi_includes.h"
+#include "winapi_main.h"
 #include "resource.h"
 
 const TCHAR className[] = "WinClass";
@@ -23,8 +23,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	wc.lpfnWndProc = WndProc;
 	wc.lpszClassName = className;
 	wc.lpszMenuName = NULL;
-	wc.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON_CPP));
-	wc.hIconSm = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON_CPP));
+	wc.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON_C));
+	wc.hIconSm = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON_C));
 	wc.style = 0;
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
