@@ -1,0 +1,1 @@
+x=msgbox("All responsibility belongs to the user!" ,0, "Important")
