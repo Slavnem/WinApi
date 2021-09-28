@@ -1,138 +1,145 @@
-/*
-* Slavnem Tarafýndan Yapýlmýþ Olup Kar Amacý Gütmez!
-* Açýk Kaynak Kod
-* Tecrübe Seviyesi = Acemi
+ï»¿/*
+* Slavnem TarafÄ±ndan YapÄ±lmÄ±ÅŸ Olup Kar AmacÄ± GÃ¼tmez!
+* AÃ§Ä±k Kaynak Kod
+* TecrÃ¼be Seviyesi = Acemi
 * 2021
 */
 
 #include "winapi_includes.h"
 #include "winapi_main.h"
 
-// Hatalar
-const TCHAR Yetkisiz_Hata_1[] = "Yetkisiz Deneme!, Yetkili Kullanýcý Ýle Deneyiniz!";
-const TCHAR YHB_1[] = "Yetki Hatasý";
-const TCHAR Dosya_Bulunamadi_1[] = "Malesef Böyle Bir Dosya Veya Program Yok!";
-const TCHAR DBB_1[] = "Dosya Hatasý";
-const TCHAR Dosya_Acilamadi_1[] = "Programý Þuanda Çalýþtýramýyoruz, Lütfen Daha Sonra Tekrar Deneyiniz!";
-const TCHAR DAB_1[] = "Çalýþmama Hatasý";
-const TCHAR Dosya_Konum_Hatasi_1[] = "Ýþlem Oluþturulamadý! Dosya Konumunu Doðru Seçtiðinizden Emin Olunuz!";
-const TCHAR DKHB_1[] = "Konum Hatasý";
+	// Hatalar
+     const TCHAR Yetkisiz_Hata_1[] = _T("Yetkisiz Deneme!, Yetkili KullanÄ±cÄ± Ä°le Deneyiniz!");
+	 const TCHAR YHB_1[] = _T("Yetki HatasÄ±");
+	 const TCHAR Dosya_Bulunamadi_1[] = _T("Malesef BÃ¶yle Bir Dosya Veya Program Yok!");
+	 const TCHAR DBB_1[] = _T("Dosya HatasÄ±");
+	 const TCHAR Dosya_Acilamadi_1[] = _T("ProgramÄ± Åžuanda Ã‡alÄ±ÅŸtÄ±ramÄ±yoruz, LÃ¼tfen Daha Sonra Tekrar Deneyiniz!");
+	 const TCHAR DAB_1[] = _T("Ã‡alÄ±ÅŸmama HatasÄ±");
+	 const TCHAR Dosya_Konum_Hatasi_1[] = _T("Ä°ÅŸlem OluÅŸturulamadÄ±! Dosya Konumunu DoÄŸru SeÃ§tiÄŸinizden Emin Olunuz!");
+	 const TCHAR DKHB_1[] = _T("Konum HatasÄ±");
 
 
-// Sorular
-const TCHAR Bilgisayar_Zamanli_Ayarla_1[] = "Bilgisayarýnýzý zamanlý þekilde ayarlamak istiyor musunuz?";
-const TCHAR BZKB_1[] = "Zamanlý Kapatma";
+	// Sorular
+	 const TCHAR Bilgisayar_Zamanli_Ayarla_1[] = _T("BilgisayarÄ±nÄ±zÄ± zamanlÄ± ÅŸekilde ayarlamak istiyor musunuz?");
+	 const TCHAR BZKB_1[] = _T("ZamanlÄ± Kapatma");
 
-const TCHAR AtikDosya_Temizleme_1[] = "Atýk Dosyalarý Silmek Ýster misiniz?";
-const TCHAR ADT_1[] = "Atýk Dosyalar";
+	 const TCHAR AtikDosya_Temizleme_1[] = _T("AtÄ±k DosyalarÄ± Silmek Ä°ster misiniz?");
+	 const TCHAR ADT_1[] = _T("AtÄ±k Dosyalar");
 
-const TCHAR InternetBellegi_Temizleme_1[] = "Ýnternet Belleðini Temizlemek Ýster misiniz?";
-const TCHAR IBT_1[] = "Ýnternet Belleði";
+	 const TCHAR InternetBellegi_Temizleme_1[] = _T("Ä°nternet BelleÄŸini Temizlemek Ä°ster misiniz?");
+	 const TCHAR IBT_1[] = _T("Ä°nternet BelleÄŸi");
 
-const TCHAR WinApi_Program_Kapat_1[] = "Programý Kapatmak Ýstediðinize Emin misiniz?";
-
-
-// DiskTamir Hata
-const TCHAR Disk_Tamir_Bulunamadi_1[] = "DiskTamir.bat bulunamadý! Oluþturmak ister misiniz?";
-const TCHAR DTBB_1[] = "DiskTamir.bat Hatasý";
-
-const TCHAR Disk_Tamir_Baslat_1[] = "Disk Tamir iþlemini baþlatýrsanýz eðer, bir daha durdurmamanýz lazým yoksa diske zarar verebilir!, Bilgisayar Yeniden baþlatýldýðýnda HDD veya SSD hýzýna göre saatler sürebilir!Kabul Ediyor musunuz ?";
-const TCHAR DTBB_2[] = "Tamir Uyarý";
-
-const TCHAR Disk_Tamir_Baslamama_1[] = "Malesef Fix.bat'ý çalýþtýramýyoruz! Tekrar Deneyiniz";
-const TCHAR DTBB_3[] = "Tamir Baþlatmama";
-
-const TCHAR Disk_Tamir_Bulunamiyor_1[] = "Malesef DiskTamir.bat bulunmaýyor! Silmediðinizden ve Adýný deðiþtirmediðinizden emin olunuz!";
-const TCHAR DTBB_4[] = "DiskTamir.bat Bulunamýyor";
+	 const TCHAR WinApi_Program_Kapat_1[] = _T("ProgramÄ± Kapatmak Ä°stediÄŸinize Emin misiniz?");
 
 
-// Button, Static, Edit
-const TCHAR Bos[] = "";
+	// DiskTamir Hata
+	 const TCHAR Disk_Tamir_Bulunamadi_1[] = _T("DiskTamir.bat bulunamadÄ±! OluÅŸturmak ister misiniz?");
+	 const TCHAR DTBB_1[] = _T("DiskTamir.bat HatasÄ±");
 
-const TCHAR Uyari[] = "Uyarý!";
-const TCHAR Hata[] = "Hata!";
+	 const TCHAR Disk_Tamir_Baslat_1[] = _T("Disk Tamir iÅŸlemini baÅŸlatÄ±rsanÄ±z eÄŸer, bir daha durdurmamanÄ±z lazÄ±m yoksa diske zarar verebilir!, Bilgisayar Yeniden baÅŸlatÄ±ldÄ±ÄŸÄ±nda HDD veya SSD hÄ±zÄ±na gÃ¶re saatler sÃ¼rebilir!Kabul Ediyor musunuz ?");
+	 const TCHAR DTBB_2[] = _T("Tamir UyarÄ±");
 
-// Bilgisayar Static //
-const TCHAR Bilgisayar_Static_1[] = "Bilgisayar";
-const TCHAR Bilgisayar_Static_2[] = "| Program Adý Veya Yeri |";
-// Bilgisayar Button //
-const TCHAR Bilgisayar_Button_1[] = "Basit Programlar";
-const TCHAR Bilgisayar_Button_2[] = "Hizmetler";
-const TCHAR Bilgisayar_Button_3[] = "Not Defteri";
-const TCHAR Bilgisayar_Button_4[] = "Kayýt Defteri";
-const TCHAR Bilgisayar_Button_5[] = "Hesap Makinesi";
-const TCHAR Bilgisayar_Button_6[] = "Çalýþtýr";
-const TCHAR Bilgisayar_Button_7[] = "Kapat";
-const TCHAR Bilgisayar_Button_8[] = "Bul";
-const TCHAR Bilgisayar_Button_9[] = "Alternatif Çalýþtýr";
-const TCHAR Bilgisayar_Button_10[] = "Alternatif Kapat";
-const TCHAR Bilgisayar_Button_11[] = "Çalýþan Uygulamalar";
+	 const TCHAR Disk_Tamir_Baslamama_1[] = _T("Malesef Fix.bat'Ä± Ã§alÄ±ÅŸtÄ±ramÄ±yoruz! Tekrar Deneyiniz");
+	 const TCHAR DTBB_3[] = _T("Tamir BaÅŸlatmama");
 
-// Kontrol Static //
-const TCHAR Kontrol_Static_1[] = "Kontrol";
-// Kontrol Button //
-const TCHAR Kontrol_Button_1[] = "Atýk Dosyalar";
-const TCHAR Kontrol_Button_2[] = "Ýnternet Belleði";
-const TCHAR Kontrol_Button_3[] = "Win32 Uygulama";
-const TCHAR Kontrol_Button_4[] = "Kontrol";
-const TCHAR Kontrol_Button_5[] = "Özellikler";
-
-// Zamanlayýcý Static //
-const TCHAR Zamanlayici_Static_1[] = "Zamanlayýcý";
-const TCHAR Zamanlayici_Static_2[] = "Süre";
-const TCHAR Zamanlayici_Static_3[] = "Dikkat! 1Saat = 60Dakika = 3600Saniye";
-const TCHAR Zamanlayici_Static_4[] = "Program Adý";
-const TCHAR Zamanlayici_Static_5[] = "Süre";
-const TCHAR Zamanlayici_Static_6[] = "    Tam Kapatmasý Ýçin Yetkili Kullanýcý Olunuz\n Zamanlama Çalýþtýktan Sonra Ekraný Küçültünüz";
-// Zamanlayýcý Button //
-const TCHAR Zamanlayici_Button_1[] = "Oturumu Kapat";
-const TCHAR Zamanlayici_Button_2[] = "Yeniden Baþlat";
-const TCHAR Zamanlayici_Button_3[] = "Uyku Modu";
-const TCHAR Zamanlayici_Button_4[] = "Bilgisayarý Kapat";
-const TCHAR Zamanlayici_Button_5[] = "Bilgisayarý Kitle";
-const TCHAR Zamanlayici_Button_6[] = "Ýptal";
-const TCHAR Zamanlayici_Button_7[] = "Zamanlý Kapat";
-const TCHAR Zamanlayici_Button_8[] = "Uygulama Zamanlayýcýyý Baþlat";
-// Zamanlayýcý TextBox //
-const TCHAR Zamanlayici_Textbox_1[] = "Örnek: ProgramAdý.exe";
-
-// Ýþletim Sistemi Static //
-const TCHAR IsletimSistemi_Static_1[] = "Ýþletim Sistemi";
-// Ýþletim Sistemi Button //
-const TCHAR IsletimSistemi_Button_1[] = "Windows Sürümü";
-const TCHAR IsletimSistemi_Button_2[] = "Powershell / Cmd";
-const TCHAR IsletimSistemi_Button_3[] = "Aygýt Yöneticisi";
-const TCHAR IsletimSistemi_Button_4[] = "C: Disk Tamir";
-const TCHAR IsletimSistemi_Button_5[] = "Sürücü Liste";
+	 const TCHAR Disk_Tamir_Bulunamiyor_1[] = _T("Malesef DiskTamir.bat bulunmaÄ±yor! SilmediÄŸinizden ve AdÄ±nÄ± deÄŸiÅŸtirmediÄŸinizden emin olunuz!");
+	 const TCHAR DTBB_4[] = _T("DiskTamir.bat BulunamÄ±yor");
 
 
-// Özel
-// Bilgisayar Hata //
-const TCHAR Bilgisayar_Error_1[] = "Malesef Sistem Bilgisini Gösteremiyoruz, msinfo32.exe'nin olup olmadýðýný kontrol ediniz ve tekrar deneyiniz";
-const TCHAR Bilgisayar_Error_2[] = "Malesef Hizmetleri Açamýyoruz, msconfig.exe'nin olup olmadýðýný kontrol ediniz ve tekrar deneyiniz";
-const TCHAR Bilgisayar_Error_3[] = "Malesef Not Defterini Açamýyoruz, notepad.exe'nin olup olmadýðýný kontrol ediniz ve tekrar deneyiniz";
-const TCHAR Bilgisayar_Error_4[] = "Malesef Kayýt Defterini Açamýyoruz, regedit.exe'nin olup olmadýðýný kontrol ediniz ve tekrar deneyiniz";
-const TCHAR Bilgisayar_Error_5[] = "Malesef Hesap Makinesini Açamýyoruz, calc.exe'nin olup olmadýðýný kontrol ediniz ve tekrar deneyiniz";
+	// Button, Static, Edit
+	 const TCHAR Bos[] = _T("");
 
-const TCHAR Bilgisayar_OpenError_1[] = "Malesef Sistem Bilgisini Açamýyoruz, Sonra tekrar deneyiniz!";
-const TCHAR Bilgisayar_OpenError_2[] = "Malesef Hizmetleri Açamýyoruz, Sonra tekrar deneyiniz!";
-const TCHAR Bilgisayar_OpenError_3[] = "Malesef Not Defterini Açamýyoruz, Sonra tekrar deneyiniz!";
-const TCHAR Bilgisayar_OpenError_4[] = "Malesef Kayýt Defterini Açamýyoruz, Sonra tekrar deneyiniz!";
-const TCHAR Bilgisayar_OpenError_5[] = "Malesef Hesap Makinesini Açamýyoruz, Sonra tekrar deneyiniz!";
+	 const TCHAR Uyari[] = _T("UyarÄ±!");
+	 const TCHAR Hata[] = _T("Hata!");
 
-// Kontrol Soru //
-const TCHAR Kontrol_Question_1[] = "Oturumu Kapatmak Ýstiyor musunuz?";
-const TCHAR Kontrol_Question_2[] = "Bilgisayarý 3 Saniye Ýçinde Yeniden Baþlatmak Ýstiyor musunuz?";
-const TCHAR Kontrol_Question_3[] = "Bilgisayarý Uyku Moduna Almak Ýstiyor musunuz?";
-const TCHAR Kontrol_Question_4[] = "Bilgisayarý 3 Saniye Ýçinde Kapatmak Ýstiyor musunuz?";
-const TCHAR Kontrol_Question_5[] = "Bilgisayarý Kitlemek Ýstiyor musunuz?";
+	// Bilgisayar Static //
+	 const TCHAR Bilgisayar_Static_1[] = _T("Bilgisayar");
+	 const TCHAR Bilgisayar_Static_2[] = _T("| Program AdÄ± Veya Yeri |");
+	// Bilgisayar Button //
+	 const TCHAR Bilgisayar_Button_1[] = _T("Basit Programlar");
+	 const TCHAR Bilgisayar_Button_2[] = _T("Hizmetler");
+	 const TCHAR Bilgisayar_Button_3[] = _T("Not Defteri");
+	 const TCHAR Bilgisayar_Button_4[] = _T("KayÄ±t Defteri");
+	 const TCHAR Bilgisayar_Button_5[] = _T("Hesap Makinesi");
+	 const TCHAR Bilgisayar_Button_6[] = _T("Ã‡alÄ±ÅŸtÄ±r");
+	 const TCHAR Bilgisayar_Button_7[] = _T("Kapat");
+	 const TCHAR Bilgisayar_Button_8[] = _T("Bul");
+	 const TCHAR Bilgisayar_Button_9[] = _T("Alternatif Ã‡alÄ±ÅŸtÄ±r");
+	 const TCHAR Bilgisayar_Button_10[] = _T("Alternatif Kapat");
+	 const TCHAR Bilgisayar_Button_11[] = _T("Ã‡alÄ±ÅŸan Uygulamalar");
 
-// Ýþletim Sistemi Hata //
-const TCHAR IsletimSistemi_Error_1[] = "Winver.exe bulunamýyor! Windows Versiyonunu gösteremiyoruz!";
-const TCHAR IsletimSistemi_Error_2[] = "PowerShell ve Cmd'nin olduðundan emin olunuz ve yetkili kullanýcý ile çalýþtýrmayý deneyiniz!";
-const TCHAR IsletimSistemi_Error_3[] = "Aygýt Yöneticisi Bulunamadý!";
-const TCHAR IsletimSistemi_Error_4[] = "Sürücü Listesini görüntülüyemiyoruz!";
+	// Kontrol Static //
+	 const TCHAR Kontrol_Static_1[] = _T("Kontrol");
+	// Kontrol Button //
+	 const TCHAR Kontrol_Button_1[] = _T("AtÄ±k Dosyalar");
+	 const TCHAR Kontrol_Button_2[] = _T("Ä°nternet BelleÄŸi");
+	 const TCHAR Kontrol_Button_3[] = _T("Win32 Uygulama");
+	 const TCHAR Kontrol_Button_4[] = _T("Kontrol");
+	 const TCHAR Kontrol_Button_5[] = _T("Ã–zellikler");
 
-const TCHAR IsletimSistemi_OpenError_1[] = "Windows Versiyonunu gösteremiyoruz, Sonra tekrar deneyiniz!";
-const TCHAR IsletimSistemi_OpenError_2[] = "PowerShell ve Cmd'yi çalýþtýramýyoruz. Sonra tekrar deneyiniz!";
-const TCHAR IsletimSistemi_OpenError_3[] = "Malesef Aygýt Yöneticisini çalýþtýramýyoruz, Sonra Tekrar deneyiniz!";
+	// ZamanlayÄ±cÄ± Static //
+	 const TCHAR Zamanlayici_Static_1[] = _T("ZamanlayÄ±cÄ±");
+	 const TCHAR Zamanlayici_Static_2[] = _T("SÃ¼re");
+	 const TCHAR Zamanlayici_Static_3[] = _T("Dikkat! 1Saat = 60Dakika = 3600Saniye");
+	 const TCHAR Zamanlayici_Static_4[] = _T("Program AdÄ±");
+	 const TCHAR Zamanlayici_Static_5[] = _T("SÃ¼re");
+	 const TCHAR Zamanlayici_Static_6[] = _T("Tam KapatmasÄ± Ä°Ã§in Yetkili KullanÄ±cÄ± Olunuz\n Zamanlama Ã‡alÄ±ÅŸtÄ±ktan Sonra EkranÄ± KÃ¼Ã§Ã¼ltÃ¼nÃ¼z");
+	// ZamanlayÄ±cÄ± Button //
+	 const TCHAR Zamanlayici_Button_1[] = _T("Oturumu Kapat");
+	 const TCHAR Zamanlayici_Button_2[] = _T("Yeniden BaÅŸlat");
+	 const TCHAR Zamanlayici_Button_3[] = _T("Uyku Modu");
+	 const TCHAR Zamanlayici_Button_4[] = _T("BilgisayarÄ± Kapat");
+	 const TCHAR Zamanlayici_Button_5[] = _T("BilgisayarÄ± Kitle");
+	 const TCHAR Zamanlayici_Button_6[] = _T("Ä°ptal");
+	 const TCHAR Zamanlayici_Button_7[] = _T("ZamanlÄ± Kapat");
+	 const TCHAR Zamanlayici_Button_8[] = _T("Uygulama ZamanlayÄ±cÄ±yÄ± BaÅŸlat");
+	// ZamanlayÄ±cÄ± TextBox //
+	 const TCHAR Zamanlayici_Textbox_1[] = _T("Ã–rnek: ProgramAdÄ±.exe");
+
+	// Ä°ÅŸletim Sistemi Static //
+	 const TCHAR IsletimSistemi_Static_1[] = _T("Ä°ÅŸletim Sistemi");
+	// Ä°ÅŸletim Sistemi Button //
+	 const TCHAR IsletimSistemi_Button_1[] = _T("Windows SÃ¼rÃ¼mÃ¼");
+	 const TCHAR IsletimSistemi_Button_2[] = _T("Powershell / Cmd");
+	 const TCHAR IsletimSistemi_Button_3[] = _T("AygÄ±t YÃ¶neticisi");
+	 const TCHAR IsletimSistemi_Button_4[] = _T("C: Disk Tamir");
+	 const TCHAR IsletimSistemi_Button_5[] = _T("SÃ¼rÃ¼cÃ¼ Liste");
+
+	// SÃ¼rÃ¼m Static
+	 const TCHAR SÃ¼rÃ¼m_Static_1[] = _T("Winapi - SÃ¼rÃ¼m 1.2.1");
+
+	// Slavnem
+	 const TCHAR Slavnem[] = _T("Slavnem");
+	 const TCHAR Slavnem_Website[] = _T("https://www.slavnem.com");
+
+
+	// Ã–zel
+	// Bilgisayar Hata //
+	 const TCHAR Bilgisayar_Error_1[] = _T("Malesef Sistem Bilgisini GÃ¶steremiyoruz, msinfo32.exe'nin olup olmadÄ±ÄŸÄ±nÄ± kontrol ediniz ve tekrar deneyiniz");
+	 const TCHAR Bilgisayar_Error_2[] = _T("Malesef Hizmetleri AÃ§amÄ±yoruz, msconfig.exe'nin olup olmadÄ±ÄŸÄ±nÄ± kontrol ediniz ve tekrar deneyiniz");
+	 const TCHAR Bilgisayar_Error_3[] = _T("Malesef Not Defterini AÃ§amÄ±yoruz, notepad.exe'nin olup olmadÄ±ÄŸÄ±nÄ± kontrol ediniz ve tekrar deneyiniz");
+	 const TCHAR Bilgisayar_Error_4[] = _T("Malesef KayÄ±t Defterini AÃ§amÄ±yoruz, regedit.exe'nin olup olmadÄ±ÄŸÄ±nÄ± kontrol ediniz ve tekrar deneyiniz");
+	 const TCHAR Bilgisayar_Error_5[] = _T("Malesef Hesap Makinesini AÃ§amÄ±yoruz, calc.exe'nin olup olmadÄ±ÄŸÄ±nÄ± kontrol ediniz ve tekrar deneyiniz");
+
+	 const TCHAR Bilgisayar_OpenError_1[] = _T("Malesef Sistem Bilgisini AÃ§amÄ±yoruz, Sonra tekrar deneyiniz!");
+	 const TCHAR Bilgisayar_OpenError_2[] = _T("Malesef Hizmetleri AÃ§amÄ±yoruz, Sonra tekrar deneyiniz!");
+	 const TCHAR Bilgisayar_OpenError_3[] = _T("Malesef Not Defterini AÃ§amÄ±yoruz, Sonra tekrar deneyiniz!");
+	 const TCHAR Bilgisayar_OpenError_4[] = _T("Malesef KayÄ±t Defterini AÃ§amÄ±yoruz, Sonra tekrar deneyiniz!");
+	 const TCHAR Bilgisayar_OpenError_5[] = _T("Malesef Hesap Makinesini AÃ§amÄ±yoruz, Sonra tekrar deneyiniz!");
+
+	// Kontrol Soru //
+	 const TCHAR Kontrol_Question_1[] = _T("Oturumu Kapatmak Ä°stiyor musunuz?");
+	 const TCHAR Kontrol_Question_2[] = _T("BilgisayarÄ± 3 Saniye Ä°Ã§inde Yeniden BaÅŸlatmak Ä°stiyor musunuz?");
+	 const TCHAR Kontrol_Question_3[] = _T("BilgisayarÄ± Uyku Moduna Almak Ä°stiyor musunuz?");
+	 const TCHAR Kontrol_Question_4[] = _T("BilgisayarÄ± 3 Saniye Ä°Ã§inde Kapatmak Ä°stiyor musunuz?");
+	 const TCHAR Kontrol_Question_5[] = _T("BilgisayarÄ± Kitlemek Ä°stiyor musunuz?");
+
+	// Ä°ÅŸletim Sistemi Hata //
+	 const TCHAR IsletimSistemi_Error_1[] = _T("Winver.exe bulunamÄ±yor! Windows Versiyonunu gÃ¶steremiyoruz!");
+	 const TCHAR IsletimSistemi_Error_2[] = _T("PowerShell ve Cmd'nin olduÄŸundan emin olunuz ve yetkili kullanÄ±cÄ± ile Ã§alÄ±ÅŸtÄ±rmayÄ± deneyiniz!");
+	 const TCHAR IsletimSistemi_Error_3[] = _T("AygÄ±t YÃ¶neticisi BulunamadÄ±!");
+	 const TCHAR IsletimSistemi_Error_4[] = _T("SÃ¼rÃ¼cÃ¼ Listesini gÃ¶rÃ¼ntÃ¼lÃ¼yemiyoruz!");
+
+	 const TCHAR IsletimSistemi_OpenError_1[] = _T("Windows Versiyonunu gÃ¶steremiyoruz, Sonra tekrar deneyiniz!");
+	 const TCHAR IsletimSistemi_OpenError_2[] = _T("PowerShell ve Cmd'yi Ã§alÄ±ÅŸtÄ±ramÄ±yoruz. Sonra tekrar deneyiniz!");
+	 const TCHAR IsletimSistemi_OpenError_3[] = _T("Malesef AygÄ±t YÃ¶neticisini Ã§alÄ±ÅŸtÄ±ramÄ±yoruz, Sonra Tekrar deneyiniz!");

@@ -12,24 +12,24 @@
 #include "winapi_language.h"
 #include "resource.h"
 
-const TCHAR BTN[] = "BUTTON";
-const TCHAR STT[] = "STATIC";
-const TCHAR EDT[] = "EDIT";
-const TCHAR COMBOX[] = "COMBOBOX";
+const TCHAR BTN[] = _T("BUTTON");
+const TCHAR STT[] = _T("STATIC");
+const TCHAR EDT[] = _T("EDIT");
+const TCHAR COMBOX[] = _T("COMBOBOX");
 
 HWND hEkranButton, hEkranStatic, hEkranZmnSure1;
-HWND hComboBox1, hComboBox2, hComboBox3, hComboBox4, hComboBox5;
+HWND hComboBox1, hComboBox2, hComboBox3, hComboBox4, hComboBox5, hBilgisayarBtn_1;
 HWND hEkranBilgisayarTextBox1, hEkranZmnTextBox1, hEkranZmnTextBox2, hEkranZmnTextBox3;
-HWND hWnd = FindWindow(NULL, "WinApi");
+HWND hWnd = FindWindow(NULL, _T("WinApi"));
 
-const TCHAR* ComboBox_1[] = { "", "Paylaşılan Klasör", "Execution Oluşturma", "Senkronizasyon", "Büyüteç"};
-const TCHAR* ComboBox_2[] = { "", "Kontrol Paneli", "İnternet Özellikleri", "Oyun Kontrolleri", "Fare Özellikleri"
-, "Ses Ayarları", "Program Kaldır", "Güç Özellikleri", "Bölge ve Dil", "Kayıt Defteri", "Hizmetler", "Yerel Grup Ekranı"
-, "Sertifikalar", "Ipv4 & Ipv6 Adresi"};
-const TCHAR* ComboBox_3[] = { "", "Disk Yönetimi", "Aygıt Yönetimi", "Olay Görüntüleyici", "DirectX", "Performans İzleyici"
-, "Erişim Defteri", "Görev Yöneticisi", "Bilgisayar Yönetimi", "Disk Temizleyici", "Karakter Ayarı"};
-const TCHAR* ComboBox_4[] = { "", "Zamanlı Kapat", "Oturumu Kapat", "Yeniden Başlat", "Uyku Modu" , "Bilgisayarı Kitle", "İptal"};
-const TCHAR* ComboBox_5[] = { "", "Bilgisayar Bilgisi", "Hizmetler", "Not Defteri", "Kayıt Defteri", "Hesap Makinesi" };
+const TCHAR* ComboBox_1[] = { _T(""), _T("Paylaşılan Klasör"), _T("Execution Oluşturma"), _T("Senkronizasyon"), _T("Büyüteç")};
+const TCHAR* ComboBox_2[] = { _T(""), _T("Kontrol Paneli"), _T("İnternet Özellikleri"), _T("Oyun Kontrolleri"), _T("Fare Özellikleri")
+, _T("Ses Ayarları"), _T("Program Kaldır"), _T("Güç Özellikleri"), _T("Bölge ve Dil"), _T("Kayıt Defteri"), _T("Hizmetler"), _T("Yerel Grup Ekranı")
+, _T("Sertifikalar"), _T("Ipv4 & Ipv6 Adresi")};
+const TCHAR* ComboBox_3[] = { _T(""), _T("Disk Yönetimi"), _T("Aygıt Yönetimi"), _T("Olay Görüntüleyici"), _T("DirectX"), _T("Performans İzleyici")
+, _T("Erişim Defteri"), _T("Görev Yöneticisi"), _T("Bilgisayar Yönetimi"), _T("Disk Temizleyici"), _T("Karakter Ayarı")};
+const TCHAR* ComboBox_4[] = { _T(""), _T("Zamanlı Kapat"), _T("Oturumu Kapat"), _T("Yeniden Başlat"), _T("Uyku Modu"), _T("Bilgisayarı Kitle"), _T("İptal")};
+const TCHAR* ComboBox_5[] = { _T(""), _T("Bilgisayar Bilgisi"), _T("Hizmetler"), _T("Not Defteri"), _T("Kayıt Defteri"), _T("Hesap Makinesi"), _T("Microsoft Paint")};
 
 // Genel Static
 #define IDC_STT 20
@@ -83,6 +83,11 @@ const TCHAR* ComboBox_5[] = { "", "Bilgisayar Bilgisi", "Hizmetler", "Not Defter
 #define IDC_BTN_WINDOWS_4 148
 #define IDC_BTN_WINDOWS_5 149
 
+// Language Button
+#define IDC_BTN_LANG_1 170
+#define IDC_BTN_LANG_2 171
+#define IDC_BTN_LANG_3 172
+
 // ComboBox
 #define IDC_CMBOX_KONTROL_1 60
 #define IDC_CMBOX_KONTROL_2 61
@@ -118,24 +123,24 @@ void ShellTrayNotifyIcon()
 
 void CalistirProgram()
 {
-	char baslat[255];
-	char calistir[255];
-	GetWindowTextA(hEkranBilgisayarTextBox1, calistir, 255);
-	GetWindowTextA(hEkranBilgisayarTextBox1, baslat, 255);
-	string str_calistir = calistir;
-	string str_baslat = "rundll32.exe shell32.dll Control_RunDLL ";
+	wchar_t baslat[255];
+	wchar_t calistir[255];
+	GetWindowTextW(hEkranBilgisayarTextBox1, calistir, 255);
+	GetWindowTextW(hEkranBilgisayarTextBox1, baslat, 255);
+	wstring str_calistir = calistir;
+	wstring str_baslat = _T("rundll32.exe shell32.dll Control_RunDLL ");
 	str_baslat = str_baslat + baslat;
-	const char* ch_calistir = str_calistir.c_str();
-	const char* ch_baslat = str_baslat.c_str();
+	const wchar_t* ch_calistir = str_calistir.c_str();
+	const wchar_t* ch_baslat = str_baslat.c_str();
 
-	ShellExecuteA(NULL, "runas", ch_calistir, NULL, NULL, SW_SHOWNORMAL);
+	ShellExecuteW(NULL, _T("runas"), ch_calistir, NULL, NULL, SW_SHOWNORMAL);
 	if (GetLastError() == ERROR_FILE_NOT_FOUND) {
 		MessageBox(hWnd, Dosya_Bulunamadi_1, DBB_1, MB_ICONERROR | MB_OK);
 	}
 	else if (GetLastError() == ERROR_ACCESS_DENIED) {
 		MessageBox(hWnd, Yetkisiz_Hata_1, YHB_1, MB_ICONERROR | MB_OK);
 	}
-	else { ShellExecute(NULL, "open", ch_baslat, NULL, NULL, SW_SHOWNORMAL); }
+	else { ShellExecute(NULL, _T("open"), ch_baslat, NULL, NULL, SW_SHOWNORMAL); }
 }
 
 void AlternatifCalistirProgram()
@@ -147,8 +152,8 @@ void AlternatifCalistirProgram()
 	si.cb = sizeof(si);
 	ZeroMemory(&pi, sizeof(pi));
 
-	char c_program[255];
-	GetWindowTextA(hEkranBilgisayarTextBox1, c_program, 255);
+	wchar_t c_program[255];
+	GetWindowTextW(hEkranBilgisayarTextBox1, c_program, 255);
 
 	BOOL bCreateProcess = NULL;
 	bCreateProcess = CreateProcess(c_program, NULL, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
@@ -176,7 +181,7 @@ void BulProgram()
 	bulfn.hwndOwner = hWnd;
 	bulfn.lpstrFile = bulFile;
 	bulfn.nMaxFile = sizeof(bulFile);
-	bulfn.lpstrFilter = _T("Tüm Dosyalar\0*.*\0Exe Dosyaları\0*.EXE\0Kurulum Dosyaları\0*.MSI\0C++ Kaynak Dosyaları\0*.CPP\0C++ Üst Bilgi Dosyaları\0*.H");
+	bulfn.lpstrFilter = _T("Tüm Dosyalar\0*.*\0Exe Dosyaları\0*.EXE\0Kurulum Dosyaları\0*.MSI\0C++ Kaynak Dosyaları\0*.CPP\0C++ Üst Bilgi Dosyaları\0*.H\0");
 	bulfn.nFilterIndex = 1;
 	bulfn.lpstrFileTitle = NULL;
 	bulfn.nMaxFileTitle = 0;
@@ -189,13 +194,13 @@ void BulProgram()
 
 void AlternatifKapatProgram()
 {
-	char kapat[255];
+	wchar_t kapat[255];
 	GetWindowText(hEkranBilgisayarTextBox1, kapat, 255);
-	string str_kapat = "taskkill /f /t /im ";
+	wstring str_kapat = _T("taskkill / f / t / im ");
 	str_kapat += kapat;
-	const char* ch_kapat = str_kapat.c_str();
+	const wchar_t* ch_kapat = str_kapat.c_str();
 
-	system(ch_kapat);
+	_wsystem(ch_kapat);
 	if (GetLastError() == ERROR_FILE_NOT_FOUND)
 	{
 		MessageBox(hWnd, Dosya_Bulunamadi_1, DBB_1, MB_ICONERROR | MB_OK);
@@ -218,11 +223,8 @@ void Zamanlama()
 	string str = "shutdown -s -t ";
 	str += sure;
 	const char* ch_str_zamanlama = str.c_str();
-	if (MessageBox(NULL, Bilgisayar_Zamanli_Ayarla_1, BZKB_1, MB_ICONEXCLAMATION | MB_OKCANCEL) == IDOK)
-	{
-		system(ch_str_zamanlama);
-	}
-	else {}
+
+	system(ch_str_zamanlama);
 }
 
 void setZamanlamaBilgisayarKapat()
@@ -232,11 +234,8 @@ void setZamanlamaBilgisayarKapat()
 	GetWindowTextA(hEkranZmnTextBox1, sure, 255);
 	str_bilgisayarkapat += sure;
 	const char* ch_str_zamanlama = str_bilgisayarkapat.c_str();
-	if (MessageBox(NULL, Bilgisayar_Zamanli_Ayarla_1, BZKB_1, MB_ICONEXCLAMATION | MB_OKCANCEL) == IDOK)
-	{
-		system(ch_str_zamanlama);
-	}
-	else {}
+
+	system(ch_str_zamanlama);
 }
 void setZamanlamaOturumKapat()
 {
@@ -247,11 +246,8 @@ void setZamanlamaOturumKapat()
 	str_t += sure;
 	str_t += str_oturumkapat;
 	const char* ch_str_suresecim = str_t.c_str();
-	if (MessageBox(NULL, Bilgisayar_Zamanli_Ayarla_1, BZKB_1, MB_ICONEXCLAMATION | MB_OKCANCEL) == IDOK)
-	{
-		system(ch_str_suresecim);
-	}
-	else {}
+
+	system(ch_str_suresecim);
 }
 void setZamanlamaYenidenBaslat()
 {
@@ -262,11 +258,8 @@ void setZamanlamaYenidenBaslat()
 	str_t += sure;
 	str_t += str_yenidenbaslat;
 	const char* ch_str_suresecim = str_t.c_str();
-	if (MessageBox(NULL, Bilgisayar_Zamanli_Ayarla_1, BZKB_1, MB_ICONEXCLAMATION | MB_OKCANCEL) == IDOK)
-	{
-		system(ch_str_suresecim);
-	}
-	else {}
+
+	system(ch_str_suresecim);
 }
 void setZamanlamaUykuModu()
 {
@@ -277,11 +270,8 @@ void setZamanlamaUykuModu()
 	str_t += sure;
 	str_t += str_uykumodu;
 	const char* ch_str_suresecim = str_t.c_str();
-	if (MessageBox(NULL, Bilgisayar_Zamanli_Ayarla_1, BZKB_1, MB_ICONEXCLAMATION | MB_OKCANCEL) == IDOK)
-	{
-		system(ch_str_suresecim);
-	}
-	else {}
+
+	system(ch_str_suresecim);
 }
 void setZamanlamaBilgisayarKitle()
 {
@@ -292,11 +282,8 @@ void setZamanlamaBilgisayarKitle()
 	str_t += sure;
 	str_t += str_bilgisayarkitle;
 	const char* ch_str_suresecim = str_t.c_str();
-	if (MessageBox(NULL, Bilgisayar_Zamanli_Ayarla_1, BZKB_1, MB_ICONEXCLAMATION | MB_OKCANCEL) == IDOK)
-	{
-		system(ch_str_suresecim);
-	}
-	else {}
+
+	system(ch_str_suresecim);
 }
 void setZamanlamaİptal()
 {
@@ -307,22 +294,19 @@ void setZamanlamaİptal()
 	str_t += sure;
 	str_t += str_iptal;
 	const char* ch_str_suresecim = str_t.c_str();
-	if (MessageBox(NULL, Bilgisayar_Zamanli_Ayarla_1, BZKB_1, MB_ICONEXCLAMATION | MB_OKCANCEL) == IDOK)
-	{
-		system(ch_str_suresecim);
-	}
-	else {}
+
+	system(ch_str_suresecim);
 }
 
-void killProcessByName(const char* filename)
+void killProcessByName(const wchar_t* filename)
 {
 	HANDLE hSnapShot = CreateToolhelp32Snapshot(TH32CS_SNAPALL, NULL);
-	PROCESSENTRY32 pEntry;
+	PROCESSENTRY32W pEntry;
 	pEntry.dwSize = sizeof(pEntry);
 	BOOL hRes = Process32First(hSnapShot, &pEntry);
 	while (hRes)
 	{
-		if (strcmp(pEntry.szExeFile, filename) == 0)
+		if (wcscmp(pEntry.szExeFile, filename) == 0)
 		{
 			HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, 0,
 				(DWORD)pEntry.th32ProcessID);
@@ -373,23 +357,26 @@ void DiskTamir()
 
 void AlternatifUygulamaZamanlama()
 {
-	char uygulama_adi[255];
-	char sure_miktari[255];
+	wchar_t uygulama_adi[255];
+	wchar_t sure_miktari[255];
 	GetWindowText(hEkranZmnTextBox2, uygulama_adi, 255);
 	GetWindowText(hEkranZmnTextBox3, sure_miktari, 255);
-	string str_sure;
-	string str_sure_1 = "timeout /t ";
-	string str_sure_2 = " && taskkill /f /t /im ";
-	string str_sure_3 = " && timeout /t 5";
+	wstring str_sure;
+	wstring str_sure_1 = _T("timeout /t ");
+	wstring str_sure_2 = _T(" && taskkill /f /t /im ");
+	wstring str_sure_3 = _T(" && timeout /t 5");
 	str_sure += str_sure_1;
 	str_sure += sure_miktari;
 	str_sure += str_sure_2;
 	str_sure += uygulama_adi;
 	str_sure += str_sure_3;
-	const char* ch_str_sure = str_sure.c_str();
+	const wchar_t* ch_str_sure = str_sure.c_str();
 
-	system(ch_str_sure);
+	_wsystem(ch_str_sure);
 }
+
+//======================== Language ==============================
+//================================================================
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	switch (msg)
@@ -408,9 +395,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		hEkranButton = CreateWindow(BTN, Bilgisayar_Button_6, WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON | WS_BORDER, 230, 110, 100, 25, hWnd, (HMENU)IDC_BTN_BILGISAYAR_6, NULL, NULL);
 		hEkranButton = CreateWindow(BTN, Bilgisayar_Button_7, WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON | WS_BORDER, 340, 110, 100, 25, hWnd, (HMENU)IDC_BTN_BILGISAYAR_7, NULL, NULL);
 		hEkranButton = CreateWindow(BTN, Bilgisayar_Button_8, WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON | WS_BORDER, 450, 110, 100, 25, hWnd, (HMENU)IDC_BTN_BILGISAYAR_8, NULL, NULL);
-		hEkranButton = CreateWindow(BTN, Bilgisayar_Button_9, WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON | WS_BORDER, 620, 50, 150, 25, hWnd, (HMENU)IDC_BTN_BILGISAYAR_9, NULL, NULL);
-		hEkranButton = CreateWindow(BTN, Bilgisayar_Button_10, WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON | WS_BORDER, 620, 80, 150, 25, hWnd, (HMENU)IDC_BTN_BILGISAYAR_10, NULL, NULL);
-		hEkranButton = CreateWindow(BTN, Bilgisayar_Button_11, WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON | WS_BORDER, 620, 120, 150, 25, hWnd, (HMENU)IDC_BTN_BILGISAYAR_11, NULL, NULL);
+		hEkranButton = CreateWindow(BTN, Bilgisayar_Button_9, WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON | WS_BORDER, 600, 50, 150, 25, hWnd, (HMENU)IDC_BTN_BILGISAYAR_9, NULL, NULL);
+		hEkranButton = CreateWindow(BTN, Bilgisayar_Button_10, WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON | WS_BORDER, 600, 80, 150, 25, hWnd, (HMENU)IDC_BTN_BILGISAYAR_10, NULL, NULL);
+		hEkranButton = CreateWindow(BTN, Bilgisayar_Button_11, WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON | WS_BORDER, 600, 120, 150, 25, hWnd, (HMENU)IDC_BTN_BILGISAYAR_11, NULL, NULL);
 		// Bilgisayar TextBox
 		hEkranBilgisayarTextBox1 = CreateWindow(EDT, Bos, WS_VISIBLE | WS_CHILD | WS_BORDER | ES_LEFT | ES_AUTOHSCROLL, 230, 80, 320, 20, hWnd, (HMENU)IDC_EDT_BILGISAYAR_TXTBOX_1, NULL, NULL);
 		// Bilgisayar ComboBox
@@ -424,11 +411,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		hEkranButton = CreateWindow(BTN, Kontrol_Button_2, WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON | WS_BORDER, 170, 190, 125, 40, hWnd, (HMENU)IDC_BTN_KONTROL_2, NULL, NULL);
 		hEkranButton = CreateWindow(BTN, Kontrol_Button_3, WS_VISIBLE | WS_CHILD | WS_BORDER, 320, 190, 125, 40, hWnd, (HMENU)IDC_BTN_KONTROL_3, NULL, NULL);
 		hEkranButton = CreateWindow(BTN, Kontrol_Button_4, WS_VISIBLE | WS_CHILD | WS_BORDER, 470, 190, 125, 40, hWnd, (HMENU)IDC_BTN_KONTROL_4, NULL, NULL);
-		hEkranButton = CreateWindow(BTN, Kontrol_Button_5, WS_VISIBLE | WS_CHILD | WS_BORDER, 630, 190, 125, 40, hWnd, (HMENU)IDC_BTN_KONTROL_5, NULL, NULL);
+		hEkranButton = CreateWindow(BTN, Kontrol_Button_5, WS_VISIBLE | WS_CHILD | WS_BORDER, 620, 190, 125, 40, hWnd, (HMENU)IDC_BTN_KONTROL_5, NULL, NULL);
 		// Kontrol ComboBox
 		hComboBox1 = CreateWindow(COMBOX, NULL, WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST, 320, 240, 125, 300, hWnd, (HMENU)IDC_CMBOX_KONTROL_1, NULL, NULL);
 		hComboBox2 = CreateWindow(COMBOX, NULL, WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST, 470, 240, 125, 300, hWnd, (HMENU)IDC_CMBOX_KONTROL_2, NULL, NULL);
-		hComboBox3 = CreateWindow(COMBOX, NULL, WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST, 630, 240, 125, 300, hWnd, (HMENU)IDC_CMBOX_KONTROL_3, NULL, NULL);
+		hComboBox3 = CreateWindow(COMBOX, NULL, WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST, 620, 240, 125, 300, hWnd, (HMENU)IDC_CMBOX_KONTROL_3, NULL, NULL);
 
 		// Zamanlayıcı Static
 		hEkranStatic = CreateWindow(STT, Zamanlayici_Static_1, WS_VISIBLE | WS_CHILD, 20, 270, 120, 40, hWnd, (HMENU)IDC_STT, NULL, NULL);
@@ -455,14 +442,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		hComboBox4 = CreateWindow(COMBOX, NULL, WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST, 150, 390, 125, 300, hWnd, (HMENU)IDC_CMBOX_ZMN_1, NULL, NULL);
 		
 		// İşletim Sistemi Static
-		hEkranStatic = CreateWindow(STT, IsletimSistemi_Static_1, WS_VISIBLE | WS_CHILD, 20, 460, 120, 40, hWnd, (HMENU)IDC_STT, NULL, NULL);
-		hEkranStatic = CreateWindow(STT, Bos, WS_VISIBLE | WS_CHILD | WS_BORDER, 0, 490, 800, 2, hWnd, (HMENU)IDC_STT, NULL, NULL);
+		hEkranStatic = CreateWindow(STT, IsletimSistemi_Static_1, WS_VISIBLE | WS_CHILD, 20, 480, 120, 40, hWnd, (HMENU)IDC_STT, NULL, NULL);
+		hEkranStatic = CreateWindow(STT, Bos, WS_VISIBLE | WS_CHILD | WS_BORDER, 0, 510, 800, 2, hWnd, (HMENU)IDC_STT, NULL, NULL);
+		hEkranStatic = CreateWindow(STT, Sürüm_Static_1, WS_VISIBLE | WS_CHILD, 320, 582, 160, 20, hWnd, (HMENU)IDC_STT, NULL, NULL);
 		// İşletim Sistemi Button
-		hEkranButton = CreateWindow(BTN, IsletimSistemi_Button_1, WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON | WS_BORDER, 15, 510, 125, 40, hWnd, (HMENU)IDC_BTN_WINDOWS_1, NULL, NULL);
-		hEkranButton = CreateWindow(BTN, IsletimSistemi_Button_2, WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON | WS_BORDER, 165, 510, 125, 40, hWnd, (HMENU)IDC_BTN_WINDOWS_2, NULL, NULL);
-		hEkranButton = CreateWindow(BTN, IsletimSistemi_Button_3, WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON | WS_BORDER, 305, 510, 150, 40, hWnd, (HMENU)IDC_BTN_WINDOWS_3, NULL, NULL);
-		hEkranButton = CreateWindow(BTN, IsletimSistemi_Button_4, WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON | WS_BORDER, 470, 510, 125, 40, hWnd, (HMENU)IDC_BTN_WINDOWS_4, NULL, NULL);
-		hEkranButton = CreateWindow(BTN, IsletimSistemi_Button_5, WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON | WS_BORDER, 620, 510, 125, 40, hWnd, (HMENU)IDC_BTN_WINDOWS_5, NULL, NULL);
+		hEkranButton = CreateWindow(BTN, IsletimSistemi_Button_1, WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON | WS_BORDER, 20, 530, 125, 40, hWnd, (HMENU)IDC_BTN_WINDOWS_1, NULL, NULL);
+		hEkranButton = CreateWindow(BTN, IsletimSistemi_Button_2, WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON | WS_BORDER, 170, 530, 125, 40, hWnd, (HMENU)IDC_BTN_WINDOWS_2, NULL, NULL);
+		hEkranButton = CreateWindow(BTN, IsletimSistemi_Button_3, WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON | WS_BORDER, 310, 530, 150, 40, hWnd, (HMENU)IDC_BTN_WINDOWS_3, NULL, NULL);
+		hEkranButton = CreateWindow(BTN, IsletimSistemi_Button_4, WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON | WS_BORDER, 475, 530, 125, 40, hWnd, (HMENU)IDC_BTN_WINDOWS_4, NULL, NULL);
+		hEkranButton = CreateWindow(BTN, IsletimSistemi_Button_5, WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON | WS_BORDER, 620, 530, 125, 40, hWnd, (HMENU)IDC_BTN_WINDOWS_5, NULL, NULL);
 
 		// ComboBox_1
 		SendMessage(hComboBox1, CB_ADDSTRING, (WPARAM)0, (LPARAM)ComboBox_1[0]);
@@ -520,6 +508,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		SendMessage(hComboBox5, CB_ADDSTRING, (WPARAM)0, (LPARAM)ComboBox_5[3]);
 		SendMessage(hComboBox5, CB_ADDSTRING, (WPARAM)0, (LPARAM)ComboBox_5[4]);
 		SendMessage(hComboBox5, CB_ADDSTRING, (WPARAM)0, (LPARAM)ComboBox_5[5]);
+		SendMessage(hComboBox5, CB_ADDSTRING, (WPARAM)0, (LPARAM)ComboBox_5[6]);
 		SendMessage(hComboBox5, CB_SETCURSEL, (WPARAM)0, 0);
 
 		break;
@@ -534,20 +523,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 				int scnk5 = SendMessage(hComboBox5, CB_GETCURSEL, 0, 0);
 				SendMessage(hComboBox5, CB_GETLBTEXT, scnk5, (LPARAM)str_combobox_5);
 
-				if (scnk5 == 1) { ShellExecute(hWnd, "open", "msinfo32.exe", NULL, NULL, SW_SHOWNORMAL);
+				if (scnk5 == 1) { ShellExecute(hWnd, _T("open"), _T("msinfo32.exe"), NULL, NULL, SW_SHOWNORMAL);
 				if (GetLastError() == ERROR_APP_INIT_FAILURE) { system("msinfo32.exe"); } }
 				//-----------------------------------------------------------------------------------------
-				if (scnk5 == 2) { ShellExecute(hWnd, "open", "services.msc", NULL, NULL, SW_SHOWNORMAL);
+				if (scnk5 == 2) { ShellExecute(hWnd, _T("open"), _T("services.msc"), NULL, NULL, SW_SHOWNORMAL);
 				if (GetLastError() == ERROR_APP_INIT_FAILURE) { system("services.msc"); } }
 				//-----------------------------------------------------------------------------------------
-				if (scnk5 == 3) { ShellExecute(hWnd, "open", "notepad.exe", NULL, NULL, SW_SHOWNORMAL);
+				if (scnk5 == 3) { ShellExecute(hWnd, _T("open"), _T("notepad.exe"), NULL, NULL, SW_SHOWNORMAL);
 				if (GetLastError() == ERROR_APP_INIT_FAILURE) { system("notepad.exe"); } }
 				//-----------------------------------------------------------------------------------------
-				if (scnk5 == 4) { ShellExecute(hWnd, "open", "regedit.exe", NULL, NULL, SW_SHOWNORMAL);
+				if (scnk5 == 4) { ShellExecute(hWnd, _T("open"), _T("regedit.exe"), NULL, NULL, SW_SHOWNORMAL);
 				if (GetLastError() == ERROR_APP_INIT_FAILURE) { system("regedit.exe"); } }
 				//-----------------------------------------------------------------------------------------
-				if (scnk5 == 4) { ShellExecute(hWnd, "open", "calc.exe", NULL, NULL, SW_SHOWNORMAL);
+				if (scnk5 == 5) { ShellExecute(hWnd, _T("open"), _T("calc.exe"), NULL, NULL, SW_SHOWNORMAL);
 				if (GetLastError() == ERROR_APP_INIT_FAILURE) { system("calc.exe"); } }
+				//-----------------------------------------------------------------------------------------
+				if (scnk5 == 6) { ShellExecute(hWnd, _T("open"), _T("mspaint.exe"), NULL, NULL, SW_SHOWNORMAL);
+				if (GetLastError() == ERROR_APP_INIT_FAILURE) { system("mspaint.exe"); } }
 				//-----------------------------------------------------------------------------------------
 
 				if (GetLastError() == ERROR_FILE_NOT_FOUND)
@@ -563,8 +555,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			CalistirProgram();
 			break;
 		case IDC_BTN_BILGISAYAR_7:
-			char programAd[255];
-			GetWindowTextA(hEkranBilgisayarTextBox1, programAd, 255);
+			wchar_t programAd[255];
+			GetWindowTextW(hEkranBilgisayarTextBox1, programAd, 255);
 			killProcessByName(programAd);
 			break;
 		case IDC_BTN_BILGISAYAR_8:
@@ -594,10 +586,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 				int scnk1 = SendMessage(hComboBox1, CB_GETCURSEL, 0, 0);
 				SendMessage(hComboBox1, CB_GETLBTEXT, scnk1, (LPARAM)str_combobox_1);
 
-				if (scnk1 == 1) { ShellExecute(hWnd, "open", "shrpubw.exe", NULL, NULL, SW_SHOWNORMAL); }
-				if (scnk1 == 2) { ShellExecute(hWnd, "open", "iexpress.exe", NULL, NULL, SW_SHOWNORMAL); }
-				if (scnk1 == 3) { ShellExecute(hWnd, "open", "mobsync.exe", NULL, NULL, SW_SHOWNORMAL); }
-				if (scnk1 == 4) { ShellExecute(hWnd, "open", "magnify.exe", NULL, NULL, SW_SHOWNORMAL); }
+				if (scnk1 == 1) { ShellExecute(hWnd, _T("open"), _T("shrpubw.exe"), NULL, NULL, SW_SHOWNORMAL); }
+				if (scnk1 == 2) { ShellExecute(hWnd, _T("open"), _T("iexpress.exe"), NULL, NULL, SW_SHOWNORMAL); }
+				if (scnk1 == 3) { ShellExecute(hWnd, _T("open"), _T("mobsync.exe"), NULL, NULL, SW_SHOWNORMAL); }
+				if (scnk1 == 4) { ShellExecute(hWnd, _T("open"), _T("magnify.exe"), NULL, NULL, SW_SHOWNORMAL); }
 
 				if (GetLastError() == ERROR_FILE_NOT_FOUND)
 				{ MessageBox(hWnd, Dosya_Bulunamadi_1, Hata, MB_ICONERROR | MB_OK); }
@@ -614,7 +606,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 				int scnk2 = SendMessage(hComboBox2, CB_GETCURSEL, 0, 0);
 				SendMessage(hComboBox2, CB_GETLBTEXT, scnk2, (LPARAM)str_combobox_2);
 
-				if (scnk2 == 1) { ShellExecute(hWnd, "open", "control.exe", NULL, NULL, SW_SHOWNORMAL); }
+				if (scnk2 == 1) { ShellExecute(hWnd, _T("open"), _T("control.exe"), NULL, NULL, SW_SHOWNORMAL); }
 				if (scnk2 == 2) { system("inetcpl.cpl"); }
 				if (scnk2 == 3) { system("joy.cpl"); }
 				if (scnk2 == 4) { system("main.cpl"); }
@@ -622,10 +614,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 				if (scnk2 == 6) { system("appwiz.cpl"); }
 				if (scnk2 == 7) { system("powercfg.cpl"); }
 				if (scnk2 == 8) { system("intl.cpl"); }
-				if (scnk2 == 9) { ShellExecute(hWnd, "runas", "regedit.exe", NULL, NULL, SW_SHOWNORMAL); }
-				if (scnk2 == 10) { ShellExecute(hWnd, "open", "services.msc", NULL, NULL, SW_SHOWNORMAL); }
-				if (scnk2 == 11) { ShellExecute(hWnd, "open", "gpedit.msc", NULL, NULL, SW_SHOWNORMAL); }
-				if (scnk2 == 12) { ShellExecute(hWnd, "open", "certmgr.msc", NULL, NULL, SW_SHOWNORMAL); }
+				if (scnk2 == 9) { ShellExecute(hWnd, _T("runas"), _T("regedit.exe"), NULL, NULL, SW_SHOWNORMAL); }
+				if (scnk2 == 10) { ShellExecute(hWnd, _T("open"), _T("services.msc"), NULL, NULL, SW_SHOWNORMAL); }
+				if (scnk2 == 11) { ShellExecute(hWnd, _T("open"), _T("gpedit.msc"), NULL, NULL, SW_SHOWNORMAL); }
+				if (scnk2 == 12) { ShellExecute(hWnd, _T("open"), _T("certmgr.msc"), NULL, NULL, SW_SHOWNORMAL); }
 				if (scnk2 == 13) { system("ipconfig && pause"); }
 
 				if (GetLastError() == ERROR_FILE_NOT_FOUND)
@@ -643,16 +635,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 				int scnk3 = SendMessage(hComboBox3, CB_GETCURSEL, 0, 0);
 				SendMessage(hComboBox3, CB_GETLBTEXT, scnk3, (LPARAM)str_combobox_3);
 
-				if (scnk3 == 1) { ShellExecute(hWnd, "open", "diskmgmt.msc", NULL, NULL, SW_SHOWNORMAL); }
-				if (scnk3 == 2) { ShellExecute(hWnd, "open", "devmgmt.msc", NULL, NULL, SW_SHOWNORMAL); }
-				if (scnk3 == 3) { ShellExecute(hWnd, "open", "eventvwr.exe", NULL, NULL, SW_SHOWNORMAL); }
-				if (scnk3 == 4) { ShellExecute(hWnd, "open", "dxdiag.exe", NULL, NULL, SW_SHOWNORMAL); }
-				if (scnk3 == 5) { ShellExecute(hWnd, "open", "perfmon.exe", NULL, NULL, SW_SHOWNORMAL); }
-				if (scnk3 == 6) { ShellExecute(hWnd, "open", "rasphone.exe", NULL, NULL, SW_SHOWNORMAL); }
-				if (scnk3 == 7) { ShellExecute(hWnd, "open", "taskmgr.exe", NULL, NULL, SW_SHOWNORMAL); }
-				if (scnk3 == 8) { ShellExecute(hWnd, "open", "compmgmt.msc", NULL, NULL, SW_SHOWNORMAL); }
-				if (scnk3 == 9) { ShellExecute(hWnd, "open", "cleanmgr.exe", NULL, NULL, SW_SHOWNORMAL); }
-				if (scnk3 == 10) { ShellExecute(hWnd, "open", "charmap.exe", NULL, NULL, SW_SHOWNORMAL); }
+				if (scnk3 == 1) { ShellExecute(hWnd, _T("open"), _T("diskmgmt.msc"), NULL, NULL, SW_SHOWNORMAL); }
+				if (scnk3 == 2) { ShellExecute(hWnd, _T("open"), _T("devmgmt.msc"), NULL, NULL, SW_SHOWNORMAL); }
+				if (scnk3 == 3) { ShellExecute(hWnd, _T("open"), _T("eventvwr.exe"), NULL, NULL, SW_SHOWNORMAL); }
+				if (scnk3 == 4) { ShellExecute(hWnd, _T("open"), _T("dxdiag.exe"), NULL, NULL, SW_SHOWNORMAL); }
+				if (scnk3 == 5) { ShellExecute(hWnd, _T("open"), _T("perfmon.exe"), NULL, NULL, SW_SHOWNORMAL); }
+				if (scnk3 == 6) { ShellExecute(hWnd, _T("open"), _T("rasphone.exe"), NULL, NULL, SW_SHOWNORMAL); }
+				if (scnk3 == 7) { ShellExecute(hWnd, _T("open"), _T("taskmgr.exe"), NULL, NULL, SW_SHOWNORMAL); }
+				if (scnk3 == 8) { ShellExecute(hWnd, _T("open"), _T("compmgmt.msc"), NULL, NULL, SW_SHOWNORMAL); }
+				if (scnk3 == 9) { ShellExecute(hWnd, _T("open"), _T("cleanmgr.exe"), NULL, NULL, SW_SHOWNORMAL); }
+				if (scnk3 == 10) { ShellExecute(hWnd, _T("open"), _T("charmap.exe"), NULL, NULL, SW_SHOWNORMAL); }
 
 				if (GetLastError() == ERROR_FILE_NOT_FOUND)
 				{ MessageBox(hWnd, Dosya_Bulunamadi_1, Hata, MB_ICONERROR | MB_OK); }
@@ -691,12 +683,24 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 				int scnk4 = SendMessage(hComboBox4, CB_GETCURSEL, 0, 0);
 				SendMessage(hComboBox4, CB_GETLBTEXT, scnk4, (LPARAM)str_combobox_4);
 
-				if (scnk4 == 1) { setZamanlamaBilgisayarKapat();}
-				if (scnk4 == 2) { setZamanlamaOturumKapat();}
-				if (scnk4 == 3) { setZamanlamaYenidenBaslat(); }
-				if (scnk4 == 4) { setZamanlamaUykuModu(); }
-				if (scnk4 == 5) { setZamanlamaBilgisayarKitle(); }
-				if (scnk4 == 6) { setZamanlamaİptal(); }
+				if (scnk4 == 1) {
+				setZamanlamaBilgisayarKapat();
+				ShowWindow(hWnd, SW_MINIMIZE); }
+				if (scnk4 == 2) {
+				ShowWindow(hWnd, SW_MINIMIZE);
+				setZamanlamaOturumKapat(); }
+				if (scnk4 == 3) {
+				ShowWindow(hWnd, SW_MINIMIZE); 
+				setZamanlamaYenidenBaslat(); }
+				if (scnk4 == 4) {
+				ShowWindow(hWnd, SW_MINIMIZE); 
+				setZamanlamaUykuModu(); }
+				if (scnk4 == 5) {
+				ShowWindow(hWnd, SW_MINIMIZE); 
+				setZamanlamaBilgisayarKitle(); }
+				if (scnk4 == 6) {
+				ShowWindow(hWnd, SW_MINIMIZE);
+				setZamanlamaİptal(); }
 
 				if (GetLastError() == ERROR_FILE_NOT_FOUND)
 				{ MessageBox(hWnd, Dosya_Bulunamadi_1, Hata, MB_ICONERROR | MB_OK); }

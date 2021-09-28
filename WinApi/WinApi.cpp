@@ -9,7 +9,7 @@
 #include "winapi_main.h"
 #include "resource.h"
 
-const TCHAR className[] = "WinClass";
+const TCHAR className[] = _T("WinClass");
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -30,18 +30,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	wc.cbWndExtra = 0;
 
 	if (!RegisterClassEx(&wc)) {
-		MessageBox(NULL, "Kayıt İşlemi Başarısız!", "Kayıt", MB_ICONERROR | MB_OK);
+		MessageBox(NULL, _T("Kayıt İşlemi Başarısız!"), _T("Kayıt"), MB_ICONERROR | MB_OK);
 		return 1;
 	}
 	int screenX = GetSystemMetrics(SM_CXSCREEN);
 	int screenY = GetSystemMetrics(SM_CYSCREEN);
 	int winW = 800;
-	int winH = 600;
+	int winH = 650;
 
-	HWND hWnd = CreateWindowEx(NULL, className, "WinApi", WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, (screenX - 800) / 2, (screenY - 600) / 2, winW, winH, NULL, NULL, hInstance, NULL);
+	HWND hWnd = CreateWindowEx(NULL, className, _T("WinApi"), WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, (screenX - winW) / 2, (screenY - winH) / 2, winW, winH, NULL, NULL, hInstance, NULL);
 
 	if (!hWnd) {
-		MessageBox(NULL, "Pencere Oluşturulamadı!", "Pencere", MB_ICONERROR | MB_OK);
+		MessageBox(NULL, _T("Pencere Oluşturulamadı!"), _T("Pencere"), MB_ICONERROR | MB_OK);
 		return 0;
 	}
 
