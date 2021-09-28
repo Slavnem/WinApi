@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.31129.286
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WinApi", "WinApi\WinApi.vcxproj", "{C835A18F-7467-4E9F-85D7-899F5E1B5988}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "WinApi v1.2.1 Kurulum", "WinApi Kurulum\WinApi v1.2.1\WinApi v1.2.1 Kurulum\WinApi v1.2.1 Kurulum.vdproj", "{C4BEE68C-0BFF-4E0D-98E6-151F54747763}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		All|x64 = All|x64
@@ -27,6 +29,12 @@ Global
 		{C835A18F-7467-4E9F-85D7-899F5E1B5988}.Release|x64.Build.0 = Release|x64
 		{C835A18F-7467-4E9F-85D7-899F5E1B5988}.Release|x86.ActiveCfg = Release|Win32
 		{C835A18F-7467-4E9F-85D7-899F5E1B5988}.Release|x86.Build.0 = Release|Win32
+		{C4BEE68C-0BFF-4E0D-98E6-151F54747763}.All|x64.ActiveCfg = Debug
+		{C4BEE68C-0BFF-4E0D-98E6-151F54747763}.All|x86.ActiveCfg = Debug
+		{C4BEE68C-0BFF-4E0D-98E6-151F54747763}.Debug|x64.ActiveCfg = Debug
+		{C4BEE68C-0BFF-4E0D-98E6-151F54747763}.Debug|x86.ActiveCfg = Debug
+		{C4BEE68C-0BFF-4E0D-98E6-151F54747763}.Release|x64.ActiveCfg = Release
+		{C4BEE68C-0BFF-4E0D-98E6-151F54747763}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
