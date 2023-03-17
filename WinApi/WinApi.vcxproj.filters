@@ -15,15 +15,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="WinApi.cpp">
-      <Filter>Kaynak Dosyalar</Filter>
+    <ClCompile Include="winapi.cpp">
+      <Filter>Kaynak Dosyaları</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="winapi_includes.h">
-      <Filter>Üst Bilgi Dosyaları</Filter>
-    </ClInclude>
-    <ClInclude Include="resource.h">
       <Filter>Üst Bilgi Dosyaları</Filter>
     </ClInclude>
     <ClInclude Include="winapi_main.h">
@@ -32,14 +29,17 @@
     <ClInclude Include="winapi_language.h">
       <Filter>Üst Bilgi Dosyaları</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Üst Bilgi Dosyaları</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="WinApi.rc">
+    <ResourceCompile Include="resource.rc">
       <Filter>Kaynak Dosyaları</Filter>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="c.ico">
+    <Image Include="winapi.ico">
       <Filter>Kaynak Dosyaları</Filter>
     </Image>
   </ItemGroup>
