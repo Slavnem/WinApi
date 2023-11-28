@@ -11,6 +11,13 @@
 #include "winapi_language.h"
 #include "resource.h"
 
+// Ön işlemciye program mesaj durumlarını tanıtıyoruz
+#define RETURN_FALSE 0; // başarısız
+#define RETURN_TRUE 1; // başarı
+#define RETURN_UNKNOWN 2; // bilinmeyen durum
+#define RETURN_ERROR 3; // kod hatası
+#define RETURN_LEAK 4; // kod açığı
+
 // Ön işlemciye program daha çalışmadan tanımlıyoruz
 #define IDC_STT 20
 
@@ -86,8 +93,8 @@ size_t _listeDongu;
 int CalistirProgram(void)
 {
 	// dizilere başlangıç olarak 0 veriyoruz
-	wchar_t baslat[255];;
-	wchar_t calistir[255];;
+	wchar_t baslat[255];
+	wchar_t calistir[255];
 	// kullanıcının yazdığı metini alıp diziye aktarıyoruz
 	GetWindowTextW(hEkranBilgisayarTextBox1, baslat, 255);
 	GetWindowTextW(hEkranBilgisayarTextBox1, calistir, 255);
@@ -102,18 +109,26 @@ int CalistirProgram(void)
 	ShellExecuteW(NULL, _T("runas"), ch_calistir, NULL, NULL, SW_SHOWNORMAL);
 
 	// hata aldığında yapıcakları, eğer hala hatalı ise -1 değeri döndürcek
-	if (GetLastError() == ERROR_FILE_NOT_FOUND) {
-		MessageBox(hWnd, Dosya_Bulunamadi_1, DBB_1, MB_ICONERROR | MB_OK);
-		return -1;
-	}
-	else if (GetLastError() == ERROR_ACCESS_DENIED) {
+	switch(GetLastError())
+	{
+	    // Dosya bulunamadı
+	    case ERROR_FILE_NOT_FOUND:
+	    	MessageBox(hWnd, Dosya_Bulunamadi_1, DBB_1, MB_ICONERROR | MB_OK);
+	    	return RETURN_ERROR;
+	    // Yetersiz izin, işlem reddedildi
+	    case ERROR_ACCESS_DENIED:
 		MessageBox(hWnd, Yetkisiz_Hata_1, YHB_1, MB_ICONERROR | MB_OK);
-		return -1;
+		return RETURN_ERROR;
+	    // Denetlememizi gerektiren bir hata yok
+	    default:
+		ShellExecute(NULL, _T("open"), ch_baslat, NULL, NULL, SW_SHOWNORMAL);
+		return RETURN_TRUE;
 	}
-	else { ShellExecute(NULL, _T("open"), ch_baslat, NULL, NULL, SW_SHOWNORMAL); }
 
-	// eğer hata olmassa, 0 yani başarı döndürecektir
-	return 0;
+	// hata yoksa zaten otomatik çalıştıracaktır
+	// fakat bilinmeyen bir durum oluşmuşsa bunu belirtmek için
+	// kod açığı döndürüyoruz
+	return RETURN_LEAK;
 } // Programı çalıştırma fonksiyonu sonu
 
 // Programı alternatif çalıştırma fonksiyonu başlangıcı
@@ -132,11 +147,12 @@ int AlternatifCalistirProgram(void)
 	wchar_t c_program[255];
 	GetWindowTextW(hEkranBilgisayarTextBox1, c_program, 255);
 
-	// işlem oluşturma kodu
+	// işlem oluşturuyoruz ve işlemin durumuna göre
+	// 1 (true) ya da 0 (false) dönecek değere
 	BOOL bCreateProcess = NULL;
 	bCreateProcess = CreateProcess(c_program, NULL, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
 
-	// işlemi bekliyor
+	// işlem için bekleme
 	WaitForSingleObject(pi.hProcess, INFINITE);
 
 	// işlemi sonlandırıyor
@@ -146,13 +162,19 @@ int AlternatifCalistirProgram(void)
 	// eğer işlem oluşmamışsa
 	if (!bCreateProcess)
 	{
-		MessageBox(hWnd, Dosya_Konum_Hatasi_1, DKHB_1, MB_ICONERROR | MB_OK);
-		return -1; // hatalı
+	    // hata
+	    MessageBox(hWnd, Dosya_Konum_Hatasi_1, DKHB_1, MB_ICONERROR | MB_OK);
+	    return RETURN_ERROR;
 	}
 	else
 	{
-		return 0; // başarılı
+	    // işlem oluşmuş, başarılı
+	    return RETURN_TRUE;
 	}
+
+	// bunların dışında bilinmeyen bir durum oluşursa
+	// kod açığı dönsün
+	return RETURN_LEAK;
 } // Programı alternatif çalıştırma fonksiyonu sonu
 
 // Program bulma fonksiyonu başlangıcı
@@ -160,7 +182,7 @@ void BulProgram(void)
 {
 	// dosya konumu için karakter tutacak dizi ve dosya açma için değişken oluşturuyoruz
 	OPENFILENAME bulfn;
-	TCHAR bulFile[260]{};
+	TCHAR bulFile[255] = {};
 
 	// bellekte yer açıyoruz
 	ZeroMemory(&bulfn, sizeof(bulfn));
@@ -185,7 +207,7 @@ void BulProgram(void)
 // Alternatif program kapatma başlangıcı
 int AlternatifKapatProgram(void)
 {
-	wchar_t kapat[255];;
+	wchar_t kapat[255];
 	GetWindowText(hEkranBilgisayarTextBox1, kapat, 255);
 	wstring str_kapat = _T("taskkill / f / t / im ");
 	str_kapat += kapat;
@@ -194,20 +216,25 @@ int AlternatifKapatProgram(void)
 	// programı kapatıyoruz
 	_wsystem(ch_kapat);
 
-	if (GetLastError() == ERROR_FILE_NOT_FOUND)
+	// hata kontrolü
+	switch(GetLastError())
 	{
+	    // dosya bulunamadı
+	    case ERROR_FILE_NOT_FOUND:
 		MessageBox(hWnd, Dosya_Bulunamadi_1, DBB_1, MB_ICONERROR | MB_OK); // hata mesajı
-		return -1; // başarısız
-	}
-	else if (GetLastError() == ERROR_ACCESS_DENIED)
-	{
+		return RETURN_ERROR; // hata
+	    // yetkisiz deneme, yetki hatası
+	    case ERROR_ACCESS_DENIED:
 		MessageBox(hWnd, Yetkisiz_Hata_1, YHB_1, MB_ICONERROR | MB_OK);
-		return -1;
+		return RETURN_ERROR;
+	    // otomatik
+	    default:
+		// başarılı dönsün
+		return RETURN_TRUE;
 	}
-	else
-	{
-		return 0; // başarılı
-	}
+
+	// eğer olurda bilinmeyen bir durum olursa
+	return RETURN_LEAK;
 } // Alternatif program kapatma sonu
 
 // Çalışan uygulamalar gösterme fonksiyonu başlangıcı
@@ -246,7 +273,7 @@ void setZamanlamaOturumKapat(void)
 // Bilgisayar yeniden başlatma zamanlama fonksiyonu başlangıcı
 void setZamanlamaYenidenBaslat(void)
 {
-	char sure[255];;
+	char sure[255];
 	string str_t = "timeout /t ";
 	string str_yenidenbaslat = " && shutdown -r";
 	GetWindowTextA(hEkranZmnTextBox1, sure, 255);
@@ -260,7 +287,7 @@ void setZamanlamaYenidenBaslat(void)
 // Bilgisayar uyku zamanlama fonksiyonu başlangıcı
 void setZamanlamaUykuModu(void)
 {
-	char sure[255];;
+	char sure[255];
 	string str_t = "timeout /t ";
 	string str_uykumodu = " && shutdown -h";
 	GetWindowTextA(hEkranZmnTextBox1, sure, 255);
@@ -330,10 +357,17 @@ void DiskTamir(void)
 	ifstream disk_tamir;
 	disk_tamir >> noskipws;
 	ShellExecuteA(NULL, "runas", "DiskTamir.bat", NULL, NULL, SW_SHOWNORMAL);
+	
 	// Hata! Dosya Oluştur
-	if (GetLastError() == ERROR_FILE_NOT_FOUND)
+	switch(GetLastError())
 	{
-		if (MessageBox(NULL, Disk_Tamir_Bulunamadi_1, DTBB_1, MB_ICONINFORMATION | MB_OKCANCEL) == IDOK) {
+	    // dosya bulunamadı
+	    case ERROR_FILE_NOT_FOUND:
+		// mesaja yapılan dönüşü kontrol etme
+		switch(MessageBox(NULL, Disk_Tamir_Bulunamadi_1, DTBB_1, MB_ICONINFORMATION | MB_OKCANCEL))
+		{
+		    // tamam dönülmüşse
+		    case IDOK:
 			ofstream disktamir_yap;
 			disktamir_yap.open("DiskTamir.bat");
 			disktamir_yap << "color 09\n" << "sfc /scannow\n" << "color 0a\n"
@@ -342,19 +376,38 @@ void DiskTamir(void)
 				<< "del /q /f DiskTamir.bat\n"
 				<< endl;
 			disktamir_yap.close();
-			if (MessageBox(NULL, Disk_Tamir_Baslat_1, DTBB_2, MB_ICONEXCLAMATION | MB_OKCANCEL) == IDOK) {
+
+			// yeni mesaja dönüş kontrolü
+			switch(MessageBox(NULL, Disk_Tamir_Baslat_1, DTBB_2, MB_ICONEXCLAMATION | MB_OKCANCEL))
+			{
+			    // işleme devam et
+			    case IDOK:
 				ShellExecuteA(NULL, "runas", "DiskTamir.bat", NULL, NULL, SW_SHOWNORMAL);
-				if (GetLastError() == ERROR_CANTOPEN) {
-					MessageBox(NULL, Disk_Tamir_Baslamama_1, DTBB_3, MB_ICONERROR | MB_OK);
-				}
-				else if (GetLastError() == ERROR_FILE_NOT_FOUND) {
-					MessageBox(NULL, Disk_Tamir_Bulunamiyor_1, DTBB_4, MB_ICONERROR | MB_OK);
-				}
-				else if (GetLastError() == ERROR_ACCESS_DENIED) {
-					MessageBox(NULL, Yetkisiz_Hata_1, YHB_1, MB_ICONERROR | MB_OK);
-				}
+				break;
 			}
-			else { remove("DiskTamir.bat"); }
+
+			// hata kontrolü
+			switch(GetLastError())
+			{
+			    // açılmaıyor
+			    case ERROR_CANTOPEN:
+				MessageBox(NULL, Disk_Tamir_Baslamama_1, DTBB_3, MB_ICONERROR | MB_OK);
+				break;
+			    // dosya bulunamadı
+			    case ERROR_FILE_NOT_FOUND:
+				MessageBox(NULL, Disk_Tamir_Bulunamiyor_1, DTBB_4, MB_ICONERROR | MB_OK);
+				break;
+			    // yetkisiz deneme
+			    case ERROR_ACCESS_DENIED:
+				MessageBox(NULL, Yetkisiz_Hata_1, YHB_1, MB_ICONERROR | MB_OK);
+				break;
+			    // kontrol edilen hatalardan hiçbiri yoksa
+			    // otomatik işlemi yap
+			    default:
+				// dosyayı sil
+				remove("DiskTamir.bat");
+				break;
+			}
 		}
 	}
 } // Disk tamir fonksiyonu sonu
@@ -492,230 +545,224 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
 		{
-			// Bilgisayar
-		case IDC_CMBOX_BILGISAYAR_1:
-			if (HIWORD(wParam) == CBN_SELENDOK)
+		    // Bilgisayar
+		    case IDC_CMBOX_BILGISAYAR_1:
+			switch(HIWORD(wParam))
 			{
+			    // seçili iteme tıklanmışsa
+			    case CBN_SELENDOK:
 				char str_combobox_5[255];
 				int scnk5 = SendMessage(hComboBox5, CB_GETCURSEL, 0, 0);
 				SendMessage(hComboBox5, CB_GETLBTEXT, scnk5, (LPARAM)str_combobox_5);
 
 				switch (scnk5)
 				{
-				case 1:
+				    case 1:
 					ShellExecute(hWnd, _T("open"), _T("msinfo32.exe"), NULL, NULL, SW_SHOWNORMAL);
 					if (GetLastError() == ERROR_APP_INIT_FAILURE) { system("msinfo32.exe"); }
 					break;
-				case 2:
+				    case 2:
 					ShellExecute(hWnd, _T("open"), _T("services.msc"), NULL, NULL, SW_SHOWNORMAL);
 					if (GetLastError() == ERROR_APP_INIT_FAILURE) { system("services.msc"); }
 					break;
-				case 3:
+				    case 3:
 					ShellExecute(hWnd, _T("open"), _T("notepad.exe"), NULL, NULL, SW_SHOWNORMAL);
 					if (GetLastError() == ERROR_APP_INIT_FAILURE) { system("notepad.exe"); }
 					break;
-				case 4:
+				    case 4:
 					ShellExecute(hWnd, _T("open"), _T("regedit.exe"), NULL, NULL, SW_SHOWNORMAL);
 					if (GetLastError() == ERROR_APP_INIT_FAILURE) { system("regedit.exe"); }
 					break;
-				case 5:
+				    case 5:
 					ShellExecute(hWnd, _T("open"), _T("calc.exe"), NULL, NULL, SW_SHOWNORMAL);
 					if (GetLastError() == ERROR_APP_INIT_FAILURE) { system("calc.exe"); }
 					break;
-				case 6:
+				    case 6:
 					ShellExecute(hWnd, _T("open"), _T("mspaint.exe"), NULL, NULL, SW_SHOWNORMAL);
 					if (GetLastError() == ERROR_APP_INIT_FAILURE) { system("mspaint.exe"); }
 					break;
-				default:
+				    default:
 					MessageBox(hWnd, Dosya_Bulunamadi_1, Hata, MB_ICONERROR | MB_OK);
 					break;
 				}
 
-				if (GetLastError() == ERROR_FILE_NOT_FOUND)
+				// hata kontrolü
+				switch(GetLastError())
 				{
+				    // dosya bulunamadı
+				    case ERROR_FILE_NOT_FOUND:
 					MessageBox(hWnd, Dosya_Bulunamadi_1, Hata, MB_ICONERROR | MB_OK);
-				}
-				else if (GetLastError() == ERROR_ACCESS_DENIED)
-				{
+					break;
+				    // yetkisiz deneme
+				    case ERROR_ACCESS_DENIED:
 					MessageBox(hWnd, Yetkisiz_Hata_1, YHB_1, MB_ICONERROR | MB_OK);
-				}
-				else if (GetLastError() == ERROR_APP_INIT_FAILURE)
-				{
+					break;
+				    // uygulama çalıştırma hatası
+				    case ERROR_APP_INIT_FAILURE:
 					MessageBox(hWnd, Dosya_Acilamadi_1, Hata, MB_ICONERROR | MB_OK);
+					break;
 				}
 			}
 			break;
 
 		case IDC_BTN_BILGISAYAR_6:
-			if (GetWindowTextW(hEkranBilgisayarTextBox1, 0, 255) == NULL)
-			{ /* Bir şey girmediği için hiçbir şey yapmayacak */ }
-			else
-			{
-				CalistirProgram();
-			}
+			if (!GetWindowTextW(hEkranBilgisayarTextBox1, 0, 255) == NULL)
+			    CalistirProgram();
 			break;
 		case IDC_BTN_BILGISAYAR_7:
-			if (GetWindowTextW(hEkranBilgisayarTextBox1, 0, 255) == NULL)
-			{ /* Bir şey girmediği için hiçbir şey yapmayacak */ }
-			else
+			if (!GetWindowTextW(hEkranBilgisayarTextBox1, 0, 255) == NULL)
 			{
-				wchar_t programAd[255];
-				GetWindowTextW(hEkranBilgisayarTextBox1, programAd, 255);
-				killProcessByName(programAd);
+			    wchar_t programAd[255];
+			    GetWindowTextW(hEkranBilgisayarTextBox1, programAd, 255);
+			    killProcessByName(programAd);
 			}
 			break;
 		case IDC_BTN_BILGISAYAR_8:
 			BulProgram();
 			break;
 		case IDC_BTN_BILGISAYAR_9:
-			if (GetWindowTextW(hEkranBilgisayarTextBox1, 0, 255) == NULL)
-			{ /* Bir şey girmediği için hiçbir şey yapmayacak */ }
-			else
-			{
-				AlternatifCalistirProgram();
-			}
+			if (!GetWindowTextW(hEkranBilgisayarTextBox1, 0, 255) == NULL)
+			    AlternatifCalistirProgram();
 			break;
 		case IDC_BTN_BILGISAYAR_10:
-			if (GetWindowTextW(hEkranBilgisayarTextBox1, 0, 255) == NULL)
-			{ /* Bir şey girmediği için hiçbir şey yapmayacak */ }
-			else
-			{
-				AlternatifKapatProgram();
-			}
+			if (!GetWindowTextW(hEkranBilgisayarTextBox1, 0, 255) == NULL)
+			    AlternatifKapatProgram();
 			break;
 		case IDC_BTN_BILGISAYAR_11:
 			CalisanUygulamalar();
 			break;
 
-		case IDC_BTN_KONTROL_1:if (MessageBox(hWnd, AtikDosya_Temizleme_1, ADT_1, MB_ICONQUESTION | MB_OKCANCEL) == IDOK)
-		{
-			system("del /s /q C:\\Windows\\Temp\\ && del /s /q %temp% && del /s /q C:\\Windows\\Prefetch\\ && timeout /t 3 && rmdir /s /q C:\\Windows\\Temp\\ && rmdir /s /q %temp% && rmdir /s /q C:\\Windows\\Prefetch\\");
-		}
+		case IDC_BTN_KONTROL_1:
+			if (MessageBox(hWnd, AtikDosya_Temizleme_1, ADT_1, MB_ICONQUESTION | MB_OKCANCEL) == IDOK)
+			    system("del /s /q C:\\Windows\\Temp\\ && del /s /q %temp% && del /s /q C:\\Windows\\Prefetch\\ && timeout /t 3 && rmdir /s /q C:\\Windows\\Temp\\ && rmdir /s /q %temp% && rmdir /s /q C:\\Windows\\Prefetch\\");
 			break;
-		case IDC_BTN_KONTROL_2: if (MessageBox(hWnd, InternetBellegi_Temizleme_1, IBT_1, MB_ICONQUESTION | MB_OKCANCEL) == IDOK)
-		{
-			system("ipconfig /release && ipconfig /renew && ipconfig /flushdns && timeout /t 3");
-		}
+		case IDC_BTN_KONTROL_2:
+			if (MessageBox(hWnd, InternetBellegi_Temizleme_1, IBT_1, MB_ICONQUESTION | MB_OKCANCEL) == IDOK)
+			    system("ipconfig /release && ipconfig /renew && ipconfig /flushdns && timeout /t 3");
 			break;
 
 		case IDC_CMBOX_KONTROL_1:
 			// Win32 Uygulamalar
-			if (HIWORD(wParam) == CBN_SELENDOK)
+			switch(HIWORD(wParam))
 			{
+			    case CBN_SELENDOK:
 				char str_combobox_1[255];
 				int scnk1 = SendMessage(hComboBox1, CB_GETCURSEL, 0, 0);
 				SendMessage(hComboBox1, CB_GETLBTEXT, scnk1, (LPARAM)str_combobox_1);
 
 				switch (scnk1)
 				{
-				case 0:
-					// boş kısmı seçti
-					break;
-				case 1:
+				    case 1:
 					ShellExecute(hWnd, _T("open"), _T("shrpubw.exe"), NULL, NULL, SW_SHOWNORMAL);
 					break;
-				case 2:
+				    case 2:
 					ShellExecute(hWnd, _T("open"), _T("iexpress.exe"), NULL, NULL, SW_SHOWNORMAL);
 					break;
-				case 3:
+				    case 3:
 					ShellExecute(hWnd, _T("open"), _T("mobsync.exe"), NULL, NULL, SW_SHOWNORMAL);
 					break;
-				case 4:
+				    case 4:
 					ShellExecute(hWnd, _T("open"), _T("magnify.exe"), NULL, NULL, SW_SHOWNORMAL);
 					break;
-				case 5:
+				    case 5:
 					ShellExecute(hWnd, _T("open"), _T("mrt"), NULL, NULL, SW_SHOWNORMAL);
 					break;
-				default:
+				    default:
 					MessageBox(hWnd, Dosya_Bulunamadi_1, Hata, MB_ICONERROR | MB_OK);
 					break;
 				}
 
-				if (GetLastError() == ERROR_FILE_NOT_FOUND)
+				// hata kontrolü
+				switch(GetLastError())
 				{
+				    // dosya bulunamadı
+				    case ERROR_FILE_NOT_FOUND:
 					MessageBox(hWnd, Dosya_Bulunamadi_1, Hata, MB_ICONERROR | MB_OK);
-				}
-				else if (GetLastError() == ERROR_ACCESS_DENIED)
-				{
+					break;
+				    // yetkisiz deneme
+				    case ERROR_ACCESS_DENIED:
 					MessageBox(hWnd, Yetkisiz_Hata_1, YHB_1, MB_ICONERROR | MB_OK);
-				}
-				else if (GetLastError() == ERROR_APP_INIT_FAILURE)
-				{
+					break;
+				    // uygulama çalıştırma hatası
+				    case ERROR_APP_INIT_FAILURE:
 					MessageBox(hWnd, Dosya_Acilamadi_1, Hata, MB_ICONERROR | MB_OK);
+					break;
 				}
 			}
 			break;
 		case IDC_CMBOX_KONTROL_2:
 			// Kontrol Uygulamalar
-			if (HIWORD(wParam) == CBN_SELENDOK)
+			switch(HIWORD(wParam))
 			{
+			    case CBN_SELENDOK:
 				char str_combobox_2[255];
 				int scnk2 = SendMessage(hComboBox2, CB_GETCURSEL, 0, 0);
 				SendMessage(hComboBox2, CB_GETLBTEXT, scnk2, (LPARAM)str_combobox_2);
 
 				switch (scnk2)
 				{
-				case 0:
-					// boş kısmı seçti
-					break;
-				case 1:
+				    case 1:
 					ShellExecute(hWnd, _T("open"), _T("control.exe"), NULL, NULL, SW_SHOWNORMAL);
 					break;
-				case 2:
+				    case 2:
 					system("inetcpl.cpl");
 					break;
-				case 3:
+				    case 3:
 					system("joy.cpl");
 					break;
-				case 4:
+				    case 4:
 					system("mmsys.cpl");
 					break;
-				case 5:
+				    case 5:
 					system("mmsys.cpl");
 					break;
-				case 6:
+				    case 6:
 					system("appwiz.cpl");
 					break;
-				case 7:
+				    case 7:
 					system("powercfg.cpl");
 					break;
-				case 8:
+				    case 8:
 					system("intl.cpl");
 					break;
-				case 9:
+				    case 9:
 					ShellExecute(hWnd, _T("runas"), _T("regedit.exe"), NULL, NULL, SW_SHOWNORMAL);
 					break;
-				case 10:
+				    case 10:
 					ShellExecute(hWnd, _T("open"), _T("services.msc"), NULL, NULL, SW_SHOWNORMAL);
 					break;
-				case 11:
+				    case 11:
 					ShellExecute(hWnd, _T("open"), _T("gpedit.msc"), NULL, NULL, SW_SHOWNORMAL);
 					break;
-				case 12:
+				    case 12:
 					ShellExecute(hWnd, _T("open"), _T("certmgr.msc"), NULL, NULL, SW_SHOWNORMAL);
 					break;
-				case 13:
+				    case 13:
 					system("ipconfig && pause");
 					break;
-				case 14:
+				    case 14:
 					system("net user && pause");
 					break;
-				default:
+				    default:
 					MessageBox(hWnd, Dosya_Bulunamadi_1, Hata, MB_ICONERROR | MB_OK);
 					break;
 				}
 
-				if (GetLastError() == ERROR_FILE_NOT_FOUND)
+				// hata kontrolü
+				switch(GetLastError())
 				{
+				    // dosya bulunamadı
+				    case ERROR_FILE_NOT_FOUND:
 					MessageBox(hWnd, Dosya_Bulunamadi_1, Hata, MB_ICONERROR | MB_OK);
-				}
-				else if (GetLastError() == ERROR_ACCESS_DENIED)
-				{
+					break;
+				    // yetkisiz deneme
+				    case ERROR_ACCESS_DENIED:
 					MessageBox(hWnd, Yetkisiz_Hata_1, YHB_1, MB_ICONERROR | MB_OK);
-				}
-				else if (GetLastError() == ERROR_APP_INIT_FAILURE)
-				{
+					break;
+				    // uygulama çalıştırma hatası
+				    case ERROR_APP_INIT_FAILURE:
 					MessageBox(hWnd, Dosya_Acilamadi_1, Hata, MB_ICONERROR | MB_OK);
+					break;
 				}
 			}
 			break;
@@ -729,225 +776,200 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 				switch (scnk3)
 				{
-				case 0:
-					// boş kısmı seçti
-					break;
-				case 1:
+				    case 1:
 					ShellExecute(hWnd, _T("open"), _T("diskmgmt.msc"), NULL, NULL, SW_SHOWNORMAL);
 					break;
-				case 2:
+				    case 2:
 					ShellExecute(hWnd, _T("open"), _T("devmgmt.msc"), NULL, NULL, SW_SHOWNORMAL);
 					break;
-				case 3:
+				    case 3:
 					ShellExecute(hWnd, _T("open"), _T("eventvwr.exe"), NULL, NULL, SW_SHOWNORMAL);
 					break;
-				case 4:
+				    case 4:
 					ShellExecute(hWnd, _T("open"), _T("dxdiag.exe"), NULL, NULL, SW_SHOWNORMAL);
 					break;
-				case 5:
+				    case 5:
 					ShellExecute(hWnd, _T("open"), _T("perfmon.exe"), NULL, NULL, SW_SHOWNORMAL);
 					break;
-				case 6:
+				    case 6:
 					ShellExecute(hWnd, _T("open"), _T("rasphone.exe"), NULL, NULL, SW_SHOWNORMAL);
 					break;
-				case 7:
+				    case 7:
 					ShellExecute(hWnd, _T("open"), _T("taskmgr.exe"), NULL, NULL, SW_SHOWNORMAL);
 					break;
-				case 8:
+				    case 8:
 					ShellExecute(hWnd, _T("open"), _T("compmgmt.msc"), NULL, NULL, SW_SHOWNORMAL);
 					break;
-				case 9:
+				    case 9:
 					ShellExecute(hWnd, _T("open"), _T("cleanmgr.exe"), NULL, NULL, SW_SHOWNORMAL);
 					break;
-				case 10:
+				    case 10:
 					ShellExecute(hWnd, _T("open"), _T("charmap.exe"), NULL, NULL, SW_SHOWNORMAL);
 					break;
-				default:
+				    default:
 					MessageBox(hWnd, Dosya_Bulunamadi_1, Hata, MB_ICONERROR | MB_OK);
 					break;
 				}
 
-				if (GetLastError() == ERROR_FILE_NOT_FOUND)
+				// hata kontrolü
+				switch(GetLastError())
 				{
+				    // dosya bulunamadı
+				    case ERROR_FILE_NOT_FOUND:
 					MessageBox(hWnd, Dosya_Bulunamadi_1, Hata, MB_ICONERROR | MB_OK);
-				}
-				else if (GetLastError() == ERROR_ACCESS_DENIED)
-				{
+					break;
+				    // yetkisiz deneme
+				    case ERROR_ACCESS_DENIED:
 					MessageBox(hWnd, Yetkisiz_Hata_1, YHB_1, MB_ICONERROR | MB_OK);
-				}
-				else if (GetLastError() == ERROR_APP_INIT_FAILURE)
-				{
+					break;
+				    // uygulama çalıştırma hatası
+				    case ERROR_APP_INIT_FAILURE:
 					MessageBox(hWnd, Dosya_Acilamadi_1, Hata, MB_ICONERROR | MB_OK);
+					break;
 				}
 			}
 			break;
 
-		case IDC_BTN_ZAMANLAYICI_1: if (MessageBox(hWnd, Kontrol_Question_1, Uyari, MB_ICONEXCLAMATION | MB_OKCANCEL) == IDOK)
-		{
+		case IDC_BTN_ZAMANLAYICI_1:
+		    if (MessageBox(hWnd, Kontrol_Question_1, Uyari, MB_ICONEXCLAMATION | MB_OKCANCEL) == IDOK)
 			system("shutdown -l");
-		} break;
-		case IDC_BTN_ZAMANLAYICI_2: if (MessageBox(hWnd, Kontrol_Question_2, Uyari, MB_ICONEXCLAMATION | MB_OKCANCEL) == IDOK)
-		{
+		    break;
+		case IDC_BTN_ZAMANLAYICI_2:
+		    if (MessageBox(hWnd, Kontrol_Question_2, Uyari, MB_ICONEXCLAMATION | MB_OKCANCEL) == IDOK)
 			system("shutdown -r -t 3");
-		} break;
-		case IDC_BTN_ZAMANLAYICI_3: if (MessageBox(hWnd, Kontrol_Question_3, Uyari, MB_ICONEXCLAMATION | MB_OKCANCEL) == IDOK)
-		{
+		    break;
+		case IDC_BTN_ZAMANLAYICI_3:
+		    if (MessageBox(hWnd, Kontrol_Question_3, Uyari, MB_ICONEXCLAMATION | MB_OKCANCEL) == IDOK)
 			system("shutdown -h");
-		} break;
-		case IDC_BTN_ZAMANLAYICI_4: if (MessageBox(hWnd, Kontrol_Question_4, Uyari, MB_ICONEXCLAMATION | MB_OKCANCEL) == IDOK)
-		{
-			system("shutdown -s -t 3");
-		} break;
-		case IDC_BTN_ZAMANLAYICI_5: if (MessageBox(hWnd, Kontrol_Question_5, Uyari, MB_ICONEXCLAMATION | MB_OKCANCEL) == IDOK)
-		{
+		    break;
+		case IDC_BTN_ZAMANLAYICI_4:
+		    if (MessageBox(hWnd, Kontrol_Question_4, Uyari, MB_ICONEXCLAMATION | MB_OKCANCEL) == IDOK)
+		        system("shutdown -s -t 3");
+		    break;
+		case IDC_BTN_ZAMANLAYICI_5:
+		    if (MessageBox(hWnd, Kontrol_Question_5, Uyari, MB_ICONEXCLAMATION | MB_OKCANCEL) == IDOK)
 			system("rundll32.exe user32.dll,LockWorkStation");
-		} break;
-		case IDC_BTN_ZAMANLAYICI_6: system("shutdown -a"); break;
-			break;
+		    break;
+		case IDC_BTN_ZAMANLAYICI_6:
+			system("shutdown -a");
+		    break;
 		case IDC_BTN_ZAMANLAYICI_8:
 			ShowWindow(hWnd, SW_MINIMIZE);
 			AlternatifUygulamaZamanlama();
-			break;
+		    break;
 		case IDC_CMBOX_ZMN_1:
-			if (HIWORD(wParam) == CBN_SELENDOK)
+			switch(HIWORD(wParam))
 			{
+			    case CBN_SELENDOK:
 				char str_combobox_4[255];
 				int scnk4 = SendMessage(hComboBox4, CB_GETCURSEL, 0, 0);
 				SendMessage(hComboBox4, CB_GETLBTEXT, scnk4, (LPARAM)str_combobox_4);
 
 				switch (scnk4)
 				{
-				case 1:
+				    case 1:
 					setZamanlamaBilgisayarKapat();
 					ShowWindow(hWnd, SW_MINIMIZE);
 					break;
-				case 2:
+				    case 2:
 					ShowWindow(hWnd, SW_MINIMIZE);
 					setZamanlamaOturumKapat();
 					break;
-				case 3:
+				    case 3:
 					ShowWindow(hWnd, SW_MINIMIZE);
 					setZamanlamaYenidenBaslat();
 					break;
-				case 4:
+				    case 4:
 					ShowWindow(hWnd, SW_MINIMIZE);
 					setZamanlamaUykuModu();
 					break;
-				case 5:
+				    case 5:
 					ShowWindow(hWnd, SW_MINIMIZE);
 					setZamanlamaBilgisayarKitle();
 					break;
-				case 6:
+				    case 6:
 					ShowWindow(hWnd, SW_MINIMIZE);
 					setZamanlamaİptal();
 					break;
-				default:
+				    default:
 					MessageBox(hWnd, Dosya_Bulunamadi_1, Hata, MB_ICONERROR | MB_OK);
 					break;
 				}
 
-				if (GetLastError() == ERROR_FILE_NOT_FOUND)
+				// hata kontrolü
+				switch(GetLastError())
 				{
+				    // dosya bulunamadı
+				    case ERROR_FILE_NOT_FOUND:
 					MessageBox(hWnd, Dosya_Bulunamadi_1, Hata, MB_ICONERROR | MB_OK);
-				}
-				else if (GetLastError() == ERROR_ACCESS_DENIED)
-				{
+					break;
+				    // yetkisiz deneme
+				    case ERROR_ACCESS_DENIED:
 					MessageBox(hWnd, Yetkisiz_Hata_1, YHB_1, MB_ICONERROR | MB_OK);
-				}
-				else if (GetLastError() == ERROR_APP_INIT_FAILURE)
-				{
+					break;
+				    // uygulama çalıştırma hatası
+				    case ERROR_APP_INIT_FAILURE:
 					MessageBox(hWnd, Dosya_Acilamadi_1, Hata, MB_ICONERROR | MB_OK);
+					break;
 				}
 			}
 			break;
 
 		case IDC_BTN_WINDOWS_1: ShellExecuteA(hWnd, "open", "winver.exe", NULL, NULL, SW_SHOWNORMAL);
 			if (GetLastError() == ERROR_FILE_NOT_FOUND)
-			{
-				MessageBox(hWnd, IsletimSistemi_Error_1, Hata, MB_ICONERROR | MB_OK);
-			}
+			    MessageBox(hWnd, IsletimSistemi_Error_1, Hata, MB_ICONERROR | MB_OK);
 			else if (GetLastError() == ERROR_APP_INIT_FAILURE)
 			{
 				system("winver.exe");
+				
 				if (GetLastError() == ERROR_APP_INIT_FAILURE)
-				{
-					MessageBox(hWnd, IsletimSistemi_OpenError_1, Hata, MB_ICONERROR | MB_OK);
-				}
+				    MessageBox(hWnd, IsletimSistemi_OpenError_1, Hata, MB_ICONERROR | MB_OK);
 				else if (GetLastError() == ERROR_FILE_NOT_FOUND)
-				{
-					MessageBox(hWnd, IsletimSistemi_Error_1, Hata, MB_ICONERROR | MB_OK);
-				}
+				    MessageBox(hWnd, IsletimSistemi_Error_1, Hata, MB_ICONERROR | MB_OK);
 				else if (GetLastError() == ERROR_ACCESS_DENIED)
-				{
-					MessageBox(hWnd, Yetkisiz_Hata_1, YHB_1, MB_ICONERROR | MB_OK);
-				}
+				    MessageBox(hWnd, Yetkisiz_Hata_1, YHB_1, MB_ICONERROR | MB_OK);
 			}
 			else if (GetLastError() == ERROR_ACCESS_DENIED)
-			{
-				MessageBox(hWnd, Yetkisiz_Hata_1, YHB_1, MB_ICONERROR | MB_OK);
-			}
-			else {}
+			    MessageBox(hWnd, Yetkisiz_Hata_1, YHB_1, MB_ICONERROR | MB_OK);
 			break;
 		case IDC_BTN_WINDOWS_2: ShellExecuteA(hWnd, "runas", "powershell.exe", NULL, NULL, SW_SHOWNORMAL);
 			if (GetLastError() == ERROR_ACCESS_DENIED)
-			{
-				MessageBox(hWnd, Yetkisiz_Hata_1, YHB_1, MB_ICONERROR | MB_OK);
-			}
+			    MessageBox(hWnd, Yetkisiz_Hata_1, YHB_1, MB_ICONERROR | MB_OK);
 			else if (GetLastError() == ERROR_FILE_NOT_FOUND)
-			{
-				MessageBox(hWnd, IsletimSistemi_Error_2, Hata, MB_ICONERROR | MB_OK);
-			}
+			    MessageBox(hWnd, IsletimSistemi_Error_2, Hata, MB_ICONERROR | MB_OK);
 			else if (GetLastError() == ERROR_APP_INIT_FAILURE)
 			{
 				system("powershell.exe");
+				
 				if (GetLastError() == ERROR_APP_INIT_FAILURE)
-				{
-					MessageBox(hWnd, IsletimSistemi_OpenError_2, Hata, MB_ICONERROR | MB_OK);
-				}
+				    MessageBox(hWnd, IsletimSistemi_OpenError_2, Hata, MB_ICONERROR | MB_OK);
 				else if (GetLastError() == ERROR_FILE_NOT_FOUND)
-				{
-					MessageBox(hWnd, IsletimSistemi_OpenError_2, Hata, MB_ICONERROR | MB_OK);
-				}
+				    MessageBox(hWnd, IsletimSistemi_OpenError_2, Hata, MB_ICONERROR | MB_OK);
 				else if (GetLastError() == ERROR_ACCESS_DENIED)
-				{
-					MessageBox(hWnd, Yetkisiz_Hata_1, YHB_1, MB_ICONERROR | MB_OK);
-				}
+				    MessageBox(hWnd, Yetkisiz_Hata_1, YHB_1, MB_ICONERROR | MB_OK);
 			}
-			else if (GetLastError() == ERROR_ACCESS_DENIED) {
-				MessageBox(hWnd, Yetkisiz_Hata_1, YHB_1, MB_ICONERROR | MB_OK);
-			}
-			else {}
+			else if (GetLastError() == ERROR_ACCESS_DENIED) 
+			    MessageBox(hWnd, Yetkisiz_Hata_1, YHB_1, MB_ICONERROR | MB_OK);
 			break;
 
 		case IDC_BTN_WINDOWS_3: ShellExecuteA(hWnd, "open", "devmgmt.msc", NULL, NULL, SW_SHOWNORMAL);
 			if (GetLastError() == ERROR_FILE_NOT_FOUND)
-			{
-				MessageBox(hWnd, IsletimSistemi_Error_3, Hata, MB_ICONERROR | MB_OK);
-			}
+			    MessageBox(hWnd, IsletimSistemi_Error_3, Hata, MB_ICONERROR | MB_OK);
 			else if (GetLastError() == ERROR_ACCESS_DENIED)
-			{
-				MessageBox(hWnd, Yetkisiz_Hata_1, YHB_1, MB_ICONERROR | MB_OK);
-			}
+			    MessageBox(hWnd, Yetkisiz_Hata_1, YHB_1, MB_ICONERROR | MB_OK);
 			else if (GetLastError() == ERROR_APP_INIT_FAILURE)
 			{
 				system("devmgmt.msc");
+				
 				if (GetLastError() == ERROR_APP_INIT_FAILURE)
-				{
-					MessageBox(hWnd, IsletimSistemi_OpenError_3, Hata, MB_ICONERROR | MB_OK);
-				}
+				    MessageBox(hWnd, IsletimSistemi_OpenError_3, Hata, MB_ICONERROR | MB_OK);
 				else if (GetLastError() == ERROR_FILE_NOT_FOUND)
-				{
-					MessageBox(hWnd, IsletimSistemi_OpenError_3, Hata, MB_ICONERROR | MB_OK);
-				}
+				    MessageBox(hWnd, IsletimSistemi_OpenError_3, Hata, MB_ICONERROR | MB_OK);
 				else if (GetLastError() == ERROR_ACCESS_DENIED)
-				{
-					MessageBox(hWnd, Yetkisiz_Hata_1, YHB_1, MB_ICONERROR | MB_OK);
-				}
+				    MessageBox(hWnd, Yetkisiz_Hata_1, YHB_1, MB_ICONERROR | MB_OK);
 			}
 			else if (GetLastError() == ERROR_ACCESS_DENIED)
-			{
-				MessageBox(hWnd, Yetkisiz_Hata_1, YHB_1, MB_ICONERROR | MB_OK);
-			}
+			    MessageBox(hWnd, Yetkisiz_Hata_1, YHB_1, MB_ICONERROR | MB_OK);
 			break;
 
 		case IDC_BTN_WINDOWS_4:
@@ -957,13 +979,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 		case IDC_BTN_WINDOWS_5: system("driverquery && pause");
 			if (GetLastError() == ERROR_APP_INIT_FAILURE)
-			{
-				MessageBox(hWnd, IsletimSistemi_Error_4, Hata, MB_ICONERROR | MB_OK);
-			}
+			    MessageBox(hWnd, IsletimSistemi_Error_4, Hata, MB_ICONERROR | MB_OK);
 			else if (GetLastError() == ERROR_ACCESS_DENIED)
-			{
-				MessageBox(hWnd, Yetkisiz_Hata_1, YHB_1, MB_ICONERROR | MB_OK);
-			}
+			    MessageBox(hWnd, Yetkisiz_Hata_1, YHB_1, MB_ICONERROR | MB_OK);
 			break;
 
 		case IDCANCEL:
@@ -974,30 +992,26 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 	// ekrandaki renkleri ayarlama
 	case WM_CTLCOLORSTATIC:
-		HDC hdcStatic;
-		hdcStatic = (HDC)wParam;
-		SetTextColor(hdcStatic, RGB(255, 255, 255));
-		SetBkMode(hdcStatic, TRANSPARENT);
-		return (LRESULT)GetStockObject(NULL_BRUSH);
-		break;
+	    HDC hdcStatic;
+	    hdcStatic = (HDC)wParam;
+	    SetTextColor(hdcStatic, RGB(255, 255, 255));
+	    SetBkMode(hdcStatic, TRANSPARENT);
+	    return (LRESULT)GetStockObject(NULL_BRUSH);
 
 	// ekranı kapama, (kullanıcı isteğine bağlı, evet hayır)
 	case WM_CLOSE:
-		if (MessageBox(hWnd, WinApi_Program_Kapat_1, Uyari, MB_ICONEXCLAMATION | MB_OKCANCEL) == IDOK)
-		{
-			DestroyWindow(hWnd);
-		}
-		break;
+	    if (MessageBox(hWnd, WinApi_Program_Kapat_1, Uyari, MB_ICONEXCLAMATION | MB_OKCANCEL) == IDOK)
+		DestroyWindow(hWnd);
+	    break;
 
 	// ekran yoketme yani kapama
 	case WM_DESTROY:
-		PostQuitMessage(0);
-		break;
+	    PostQuitMessage(0);
+	    break;
 	default:
-		return DefWindowProc(hWnd, msg, wParam, lParam);
-		break;
+	    return DefWindowProc(hWnd, msg, wParam, lParam);
 	}
 
-	return 0; // başarılı
+	return RETURN_TRUE;
 } // GENEL SONU
 #endif // winapi_main_h
