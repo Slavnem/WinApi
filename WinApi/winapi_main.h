@@ -167,10 +167,8 @@ int AlternatifCalistirProgram(void)
 	    return RETURN_ERROR;
 	}
 	else
-	{
 	    // işlem oluşmuş, başarılı
 	    return RETURN_TRUE;
-	}
 
 	// bunların dışında bilinmeyen bir durum oluşursa
 	// kod açığı dönsün
